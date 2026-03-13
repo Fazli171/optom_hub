@@ -2,7 +2,8 @@
 # "kod": xabar_id (kanaldagi xabar tartib raqami)
 movies = {
     "101": 8,
-    "102": 6
+    "102": 6,
+    "103": 10
 }
 
 # foydalanuvchilar (obuna bo'lganlar IDsi)
