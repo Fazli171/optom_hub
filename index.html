@@ -1,667 +1,1009 @@
 <!DOCTYPE html>
-<html lang="uz" data-theme="dark">
+<html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Challenge Elite</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500&display=swap" rel="stylesheet">
-<style>
-/* Challenge faylidagi premium estetik dizayn va ranglar tizimi */
-:root {
-  --bg: #f5f0e8;
-  --s1: #ffffff;
-  --s2: #fdf8f0;
-  --s3: #e0d8cc;
-  --bdr: #e0d8cc;
-  --bdr2: rgba(26,26,46,0.1);
-  --acc: #ff6b35;
-  --acc2: #ffd23f;
-  --grn: #00b894;
-  --red: #e84393;
-  --txt: #1a1a2e;
-  --m1: #7c6e65;
-  --m2: #4a4a5a;
-  --shadow: 0 2px 20px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
-  --radius: 20px;
-  --f: 'Syne', sans-serif;
-  --mono: 'DM Mono', monospace;
-}
-[data-theme="dark"] {
-  --bg: #0d0d14;
-  --s1: #16161f;
-  --s2: #1e1e2a;
-  --s3: #2d2d3d;
-  --bdr: #2d2d3d;
-  --bdr2: rgba(255,255,255,0.07);
-  --acc: #ff6b35;
-  --acc2: #ffd23f;
-  --grn: #00cec9;
-  --red: #fd79a8;
-  --txt: #f0eee8;
-  --m1: #8a8a9a;
-  --m2: #b0b0c0;
-  --shadow: 0 2px 20px rgba(0,0,0,0.3);
-  --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Challenge Elite ⚡</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --bg: #f5f0e8;
+            --surface: #ffffff;
+            --surface2: #fdf8f0;
+            --accent: #ff6b35;
+            --accent2: #ffd23f;
+            --green: #00b894;
+            --red: #e84393;
+            --blue: #0984e3;
+            --border: #e0d8cc;
+            --text: #1a1a2e;
+            --muted: #7c6e65;
+            --shadow: 0 2px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+            --radius: 20px;
+        }
+        [data-theme="dark"] {
+            --bg: #0d0d14;
+            --surface: #16161f;
+            --surface2: #1e1e2a;
+            --accent: #ff6b35;
+            --accent2: #ffd23f;
+            --green: #00cec9;
+            --red: #fd79a8;
+            --blue: #74b9ff;
+            --border: #2d2d3d;
+            --text: #f0eee8;
+            --muted: #8a8a9a;
+            --shadow: 0 2px 20px rgba(0,0,0,0.3);
+            --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
+        }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg); color: var(--txt); font-family: var(--f);
-  min-height: 100vh; padding-bottom: 40px;
-  transition: background .35s, color .35s; overflow-x: hidden;
-}
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
+        
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            padding: 0 0 80px 0;
+            transition: background 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
 
-/* HEADER */
-.hdr {
-  position: sticky; top: 0; z-index: 120;
-  background: var(--bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-  border-bottom: 1px solid var(--bdr);
-  padding: 12px 14px;
-  display: flex; align-items: center; justify-content: space-between; gap: 6px;
-}
-.logo {
-  font-size: 14px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15;
-  color: var(--txt); white-space: nowrap; flex-shrink: 0; cursor: pointer;
-}
-.logo span { color: var(--acc); }
+        /* ===== HEADER ===== */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+            padding: 14px 16px 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+        }
+        .app-title {
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
+        .app-title span { color: var(--accent); }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+        .icon-btn {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 15px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+            box-shadow: var(--shadow);
+        }
+        .icon-btn:active { transform: scale(0.92); }
 
-.hdr-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-.hbtn {
-  background: var(--s2); border: 1px solid var(--bdr); color: var(--m2);
-  height: 36px; padding: 0 12px; border-radius: 10px;
-  font-size: 12px; font-weight: 700; cursor: pointer;
-  display: flex; align-items: center; gap: 4px;
-  transition: all .2s; white-space: nowrap; font-family: var(--f);
-  box-shadow: var(--shadow);
-}
-.hbtn.danger { color: var(--red); }
-.hbtn:active { transform: scale(0.95); }
+        /* ===== DASHBOARD ===== */
+        .dashboard {
+            margin: 16px;
+            background: var(--text);
+            border-radius: 28px;
+            padding: 24px;
+            color: var(--bg);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+        .dashboard::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 180px; height: 180px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.12;
+        }
+        .dashboard::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; left: -30px;
+            width: 200px; height: 200px;
+            background: var(--accent2);
+            border-radius: 50%;
+            opacity: 0.08;
+        }
+        .dash-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .dash-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.5;
+        }
+        .dash-amount {
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            font-size: 38px;
+            font-weight: 800;
+            line-height: 1;
+            margin-top: 4px;
+            letter-spacing: -1px;
+        }
+        .dash-amount-label { font-size: 11px; opacity: 0.5; margin-top: 4px; }
+        .target-pill {
+            background: rgba(255,255,255,0.12);
+            border-radius: 12px;
+            padding: 8px 14px;
+            text-align: right;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .target-pill small { font-size: 8px; opacity: 0.5; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        .target-pill b { font-size: 14px; color: var(--accent2); }
 
-.chip {
-  background: var(--s2); border: 1px solid var(--bdr);
-  height: 36px; padding: 0 12px; border-radius: 10px;
-  display: flex; align-items: center; gap: 5px; cursor: pointer; transition: all .2s;
-  box-shadow: var(--shadow);
-}
-.chip:active { transform: scale(0.95); }
-.chip-lbl { font-size: 8px; color: var(--m1); font-weight: 700; letter-spacing: 1px; font-family: var(--mono); text-transform: uppercase; }
-.chip-val { font-size: 14px; font-weight: 700; color: var(--acc); }
-.chip-ico { font-size: 11px; opacity: .7; }
+        /* Progress bar */
+        .prog-wrap { margin: 16px 0 8px; }
+        .prog-bar-bg { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        .prog-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+        .prog-info { display: flex; justify-content: space-between; margin-top: 6px; }
+        .prog-info span { font-size: 10px; opacity: 0.55; font-weight: 600; }
 
-/* MODAL / OVERLAY */
-.overlay {
-  display: none; position: fixed; inset: 0; z-index: 300;
-  background: rgba(0,0,0,.6); backdrop-filter: blur(10px);
-  align-items: flex-end; justify-content: center;
-}
-.overlay.open { display: flex; }
-.modal {
-  background: var(--s1); border: 1px solid var(--bdr);
-  border-radius: 24px 24px 0 0;
-  padding: 24px 20px 40px;
-  width: 100%; max-width: 480px;
-  box-shadow: var(--shadow-lg);
-}
-.modal h2 { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
-.mf { margin-bottom: 15px; }
-.mf label { font-size: 9px; color: var(--m1); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-family: var(--mono); display: block; margin-bottom: 6px; }
-.mf input {
-  width: 100%; background: var(--s2); border: 1px solid var(--bdr);
-  color: var(--txt); font-size: 16px; font-weight: 600;
-  padding: 12px 14px; border-radius: 12px; font-family: var(--mono);
-}
-.mf input:focus { border-color: var(--acc); }
-.mactions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-.mbtn-cancel {
-  background: var(--s2); border: 1px solid var(--bdr); color: var(--m2);
-  padding: 14px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: var(--f);
-}
-.mbtn-save {
-  background: var(--acc); border: none; color: #fff; padding: 14px; border-radius: 14px;
-  font-weight: 800; font-size: 13px; cursor: pointer; font-family: var(--f);
-  box-shadow: 0 4px 16px rgba(255,107,53,0.3);
-}
+        /* Status badge */
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 10px; font-weight: 700;
+            padding: 5px 12px; border-radius: 20px;
+            margin-top: 8px;
+        }
+        .status-ahead { background: rgba(0,206,201,0.2); color: #00cec9; }
+        .status-behind { background: rgba(253,121,168,0.2); color: #fd79a8; }
+        .status-ok { background: rgba(255,210,63,0.2); color: #ffd23f; }
 
-/* WRAP */
-.wrap { padding: 14px 14px 0; position: relative; z-index: 1; }
+        /* Stats mini */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: none;
+        }
+        .stat-mini { text-align: center; }
+        .stat-mini b { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; font-size: 14px; display: block; }
+        .stat-mini small { font-size: 8px; opacity: 0.4; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-mini.green b { color: var(--green); }
+        .stat-mini.red b { color: var(--red); }
+        .stat-mini.yellow b { color: var(--accent2); }
 
-/* HERO MONITOR */
-.hero {
-  background: linear-gradient(145deg, var(--s1), rgba(255,107,53,0.03));
-  border: 1px solid var(--bdr); border-radius: 24px;
-  padding: 22px 20px; margin-bottom: 14px; position: relative; overflow: hidden;
-  box-shadow: var(--shadow-lg);
-}
-.hero::after {
-  content: ''; position: absolute; top: -40px; right: -30px;
-  width: 140px; height: 140px;
-  background: radial-gradient(circle, rgba(255,107,53,0.12), transparent 70%); pointer-events: none;
-}
-.hero-lbl {
-  font-size: 8.5px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-  color: var(--m1); margin-bottom: 6px; font-family: var(--mono);
-  display: flex; align-items: center; gap: 5px;
-}
-.dot { width: 6px; height: 6px; background: var(--grn); border-radius: 50%; animation: blink 2s infinite; flex-shrink: 0; }
-@keyframes blink { 0%,100% { opacity:1 } 50% { opacity:.3 } }
-.hero-amt { font-size: 30px; font-weight: 800; line-height: 1.2; margin-bottom: 2px; }
-.hero-amt span { background: linear-gradient(135deg, var(--txt), var(--m2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.hero-cur { font-size: 13px; font-weight: 600; color: var(--m1); font-family: var(--mono); margin-left: 5px; -webkit-text-fill-color: initial; }
+        /* ===== NAV ===== */
+        .nav-wrap { padding: 0 16px; margin: 16px 0; }
+        .nav-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .nav-scroll::-webkit-scrollbar { display: none; }
+        .nav-chip {
+            flex-shrink: 0;
+            padding: 9px 18px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1.5px solid var(--border);
+            background: var(--surface);
+            color: var(--muted);
+            transition: all 0.2s;
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            letter-spacing: 0.3px;
+        }
+        .nav-chip.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 16px rgba(255,107,53,0.35);
+        }
+        .nav-chip:active { transform: scale(0.95); }
 
-.prog-label { font-size: 11px; font-weight: 700; color: var(--acc); margin: 14px 0 6px; font-family: var(--mono); }
-.prog-track { height: 6px; background: var(--s3); border-radius: 10px; overflow: hidden; }
-.prog-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--acc), var(--acc2)); border-radius: 10px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+        /* ===== CONTENT ===== */
+        .content { padding: 0 16px; }
+        .section { display: none; }
+        .section.active { display: block; }
 
-.ov-status { margin-top: 10px; }
-.spill { display: inline-flex; align-items: center; gap: 4px; padding: 5px 12px; border-radius: 20px; font-size: 9.5px; font-weight: 800; letter-spacing: .4px; font-family: var(--mono); }
-.sup { background: rgba(0,184,148,0.1); color: var(--grn); border: 1px solid rgba(0,184,148,0.2); }
-.sdn { background: rgba(232,67,147,0.1); color: var(--red); border: 1px solid rgba(232,67,147,0.2); }
+        /* ===== WALLET ===== */
+        .wallet-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 14px;
+            border: 1.5px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+        .wallet-card h3 {
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .field { margin-bottom: 12px; }
+        .field label {
+            display: block;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+        .field input, .field textarea {
+            width: 100%;
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            color: var(--text);
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 14px;
+            border-radius: 12px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .field input:focus, .field textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+        }
+        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+        .btn-inc, .btn-exp {
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            letter-spacing: 0.5px;
+        }
+        .btn-inc { background: var(--green); color: #fff; box-shadow: 0 4px 16px rgba(0,206,201,0.3); }
+        .btn-exp { background: var(--red); color: #fff; box-shadow: 0 4px 16px rgba(232,67,147,0.3); }
+        .btn-inc:active, .btn-exp:active { transform: scale(0.96); }
 
-.stats-panel { grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--bdr); }
-.sbox { background: var(--s2); border: 1px solid var(--bdr); border-radius: 14px; padding: 10px 6px; text-align: center; }
-.sbox b { font-size: 12px; display: block; margin-top: 3px; color: var(--txt); font-family: var(--mono); }
-.sbox small { font-size: 7px; color: var(--m1); text-transform: uppercase; font-weight: 700; letter-spacing: .6px; }
+        /* System toggle */
+        .sys-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1.5px solid;
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+        .sys-on { background: rgba(0,206,201,0.08); border-color: var(--green); color: var(--green); }
+        .sys-off { background: rgba(232,67,147,0.08); border-color: var(--red); color: var(--red); }
 
-/* HORIZONTAL NAVIGATION */
-.nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; margin-bottom: 4px; }
-.nav::-webkit-scrollbar { display: none; }
-.np {
-  background: var(--s1); color: var(--m1); border: 1px solid var(--bdr);
-  padding: 10px 16px; border-radius: 50px;
-  font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;
-  transition: all .2s; font-family: var(--mono); box-shadow: var(--shadow);
-}
-.np:active { transform: scale(0.95); }
-.np.active { background: var(--acc); color: #fff; border-color: var(--acc); box-shadow: 0 4px 16px rgba(255,107,53,0.3); }
+        /* History items */
+        .hist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--surface);
+            border-radius: 14px;
+            margin-bottom: 8px;
+            border: 1.5px solid var(--border);
+            animation: slideIn 0.25s ease;
+        }
+        @keyframes slideIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+        .hist-item .meta b { font-size: 13px; font-weight: 600; display: block; }
+        .hist-item .meta small { font-size: 11px; font-weight: 700; }
+        .hist-del { background: none; border: none; font-size: 14px; cursor: pointer; opacity: 0.4; transition: opacity 0.2s; padding: 4px; }
+        .hist-del:hover { opacity: 1; }
 
-/* SECTIONS */
-.sec { display: none; }
-.sec.on { display: block; }
+        /* ===== CHALLENGE CARDS ===== */
+        .day-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 14px;
+            border: 1.5px solid var(--border);
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            animation: cardIn 0.3s ease;
+        }
+        @keyframes cardIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+        .day-card.locked { opacity: 0.85; }
+        .day-card.editing { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,107,53,0.1); }
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .card-head h3 {
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+        .badge {
+            font-size: 8px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid currentColor;
+        }
+        .badge-on { color: var(--blue); background: rgba(9,132,227,0.08); }
+        .badge-up { color: var(--green); background: rgba(0,206,201,0.1); }
+        .badge-dn { color: var(--red); background: rgba(232,67,147,0.1); }
+        .edit-btn {
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            color: var(--muted);
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            transition: all 0.15s;
+        }
+        .edit-btn:active { transform: scale(0.93); }
+        .locked .field input { pointer-events: none; border-color: transparent; background: transparent; padding-left: 0; color: var(--text); }
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .profit-box {
+            grid-column: span 2;
+            background: rgba(0,206,201,0.06);
+            border: 1.5px solid rgba(0,206,201,0.2);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+        }
+        .profit-box small { font-size: 8px; color: var(--muted); display: block; text-transform: uppercase; letter-spacing: 1px; }
+        .profit-box b { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; font-size: 18px; color: var(--green); }
+        .save-btn {
+            display: none;
+            width: 100%;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 14px;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 16px rgba(255,107,53,0.35);
+            transition: transform 0.15s;
+        }
+        .save-btn:active { transform: scale(0.97); }
+        .editing .save-btn { display: block; }
 
-/* DAY CARDS */
-.dcard { background: var(--s1); border: 1px solid var(--bdr); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; box-shadow: var(--shadow); transition: border-color .2s; }
-.dcard.editing { border-color: var(--acc); box-shadow: 0 0 0 3px rgba(255,107,53,0.08); }
-.dcard-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.dnum { font-size: 16px; font-weight: 800; }
-.dnum em { color: var(--acc); font-style: normal; }
+        /* ===== WORDS ===== */
+        .words-card { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; border: 1.5px solid var(--border); box-shadow: var(--shadow); }
+        .words-card h3 { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 800; margin-bottom: 10px; }
+        .words-card textarea { width: 100%; height: 110px; background: var(--surface2); border: 1.5px solid var(--border); color: var(--text); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; border-radius: 12px; padding: 10px 12px; resize: none; font-size: 13px; line-height: 1.6; transition: border-color 0.2s; }
+        .words-card textarea:focus { border-color: var(--accent); }
+        .word-count { font-size: 10px; color: var(--muted); margin-top: 6px; font-weight: 600; }
 
-.edit-btn {
-  background: var(--s2); border: 1px solid var(--bdr); color: var(--m1);
-  padding: 6px 14px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer;
-  transition: all .2s; font-family: var(--mono);
-}
-.edit-btn:active { border-color: var(--acc); color: var(--acc); }
+        /* ===== FLOATING BOTTOM BAR ===== */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            padding: 10px 16px 20px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            z-index: 99;
+            backdrop-filter: blur(12px);
+        }
+        .bb-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 14px;
+            border-radius: 12px;
+            transition: background 0.15s;
+            color: var(--muted);
+        }
+        .bb-btn.active { color: var(--accent); }
+        .bb-btn span { font-size: 18px; }
+        .bb-btn small { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-.fg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.fl label { font-size: 7.5px; color: var(--m1); display: block; margin-bottom: 5px; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; font-family: var(--mono); }
-.fl input {
-  width: 100%; background: var(--s2); border: 1px solid var(--bdr);
-  color: var(--txt); font-size: 14px; font-weight: 600;
-  padding: 11px 12px; border-radius: 12px; font-family: var(--mono);
-  transition: border-color .2s; -webkit-appearance: none;
-}
-.fl input:focus { border-color: var(--acc); }
-.locked .fl input { pointer-events: none; border-color: transparent; background: transparent; padding-left: 0; }
+        /* ===== SECTION HEADERS ===== */
+        .sec-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .sec-header h2 {
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .sec-action {
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            color: var(--muted);
+            padding: 7px 14px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .sec-action:active { transform: scale(0.93); }
 
-.profit-row {
-  grid-column: span 2; background: rgba(0,184,148,0.05); border: 1px solid rgba(0,184,148,0.15);
-  border-radius: 12px; padding: 12px; text-align: center;
-}
-.profit-row small { font-size: 7.5px; color: var(--m1); text-transform: uppercase; font-weight: 700; font-family: var(--mono); }
-.profit-row b { font-size: 17px; font-weight: 800; color: var(--grn); display: block; margin-top: 2px; font-family: var(--mono); }
+        /* ===== CONFETTI ===== */
+        .confetti-piece {
+            position: fixed;
+            width: 10px; height: 10px;
+            border-radius: 2px;
+            animation: confettiFall 2.5s linear forwards;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
 
-.save-btn {
-  display: none; width: 100%;
-  background: var(--acc); color: #fff; border: none; padding: 14px; border-radius: 14px;
-  font-weight: 800; font-size: 13px; margin-top: 14px; cursor: pointer;
-  box-shadow: 0 4px 16px rgba(255,107,53,0.3); font-family: var(--f);
-}
-.editing .save-btn { display: block; }
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: var(--text);
+            color: var(--bg);
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* WALLET & LUG'AT */
-.sys-btn { width: 100%; padding: 14px; border-radius: 14px; font-weight: 800; cursor: pointer; margin-bottom: 12px; font-size: 12px; font-family: var(--mono); transition: all .2s; letter-spacing: .4px; }
-.sys-on { background: rgba(0,184,148,0.08); border: 1px solid rgba(0,184,148,0.25); color: var(--grn); }
-.sys-off { background: rgba(232,67,147,0.08); border: 1px solid rgba(232,67,147,0.25); color: var(--red); }
+        /* ===== MOTIVATION BANNER ===== */
+        .motive-banner {
+            background: linear-gradient(135deg, var(--accent), #ff8c42);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            margin-bottom: 14px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .motive-banner .icon { font-size: 32px; }
+        .motive-banner h4 { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 800; margin-bottom: 3px; }
+        .motive-banner p { font-size: 11px; opacity: 0.85; line-height: 1.4; }
 
-.wcard { background: var(--s1); border: 1px solid var(--bdr); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow); }
-.wcard .fl { margin-bottom: 12px; }
-.wcard .fl input { background: var(--s2); font-size: 15px; }
+        /* mini chart bars */
+        .mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 50px; margin-top: 12px; }
+        .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .chart-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.8s cubic-bezier(.4,0,.2,1); min-height: 2px; }
+        .chart-label { font-size: 8px; color: var(--muted); font-weight: 700; }
 
-.wbtns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
-.winc { background: var(--grn); color: #fff; border: none; padding: 14px 6px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: var(--f); box-shadow: 0 4px 16px rgba(0,184,148,0.2); }
-.wexp { background: var(--red); color: #fff; border: none; padding: 14px 6px; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer; font-family: var(--f); box-shadow: 0 4px 16px rgba(232,67,147,0.2); }
-.winc:active, .wexp:active { transform: scale(0.97); }
+        /* Empty state */
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
+        .empty-state .emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+        .empty-state p { font-size: 13px; line-height: 1.5; }
 
-.hist-item {
-  background: var(--s1); border: 1px solid var(--bdr);
-  padding: 14px; border-radius: 14px; margin-bottom: 8px;
-  display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow);
-}
-.hist-msg { font-size: 14px; font-weight: 700; }
-.hist-amt { font-size: 13px; font-weight: 800; font-family: var(--mono); }
-.del-btn { background: none; border: none; color: var(--m1); font-size: 16px; cursor: pointer; padding: 4px; opacity: 0.6; }
-.del-btn:hover { opacity: 1; }
-
-/* STATS */
-.stgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.stcard { background: var(--s1); border: 1px solid var(--bdr); border-radius: var(--radius); padding: 18px 14px; text-align: center; box-shadow: var(--shadow); }
-.stcard.full { grid-column: span 2; }
-.stval { font-size: 20px; font-weight: 800; display: block; margin: 5px 0 2px; font-family: var(--mono); letter-spacing: -0.5px; }
-.stlab { font-size: 8px; color: var(--m1); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; font-family: var(--mono); }
-.tu { color: var(--grn); font-size: 11px; font-family: var(--mono); font-weight: 700; }
-.td { color: var(--red); font-size: 11px; font-family: var(--mono); font-weight: 700; }
-
-.chcard { background: var(--s1); border: 1px solid var(--bdr); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow); }
-.chtitle { font-size: 9.5px; color: var(--m1); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 14px; font-family: var(--mono); }
-
-/* WORDS AREA */
-.wdcard { background: var(--s1); border: 1px solid var(--bdr); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; box-shadow: var(--shadow); }
-.wdcard strong { font-size: 15px; font-weight: 800; display: block; margin-bottom: 10px; }
-.wdcard strong em { color: var(--acc); font-style: normal; }
-textarea { width: 100%; height: 95px; background: var(--s2); border: 1px solid var(--bdr); color: var(--txt); border-radius: 12px; padding: 12px; resize: none; font-size: 14px; font-family: var(--mono); transition: border-color .2s; line-height: 1.5; }
-textarea:focus { border-color: var(--acc); }
-
-.dl-btn { width: 100%; background: var(--s1); border: 1px solid var(--bdr); color: var(--m2); padding: 14px; border-radius: 14px; font-weight: 700; cursor: pointer; font-size: 12px; margin-bottom: 12px; font-family: var(--mono); box-shadow: var(--shadow); }
-.dl-btn:active { transform: scale(0.98); }
-.stitle { font-size: 9px; font-weight: 700; color: var(--m1); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; font-family: var(--mono); }
-
-@keyframes fu { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.dcard, .wcard, .hist-item, .chcard, .stcard, .wdcard { animation: fu .25s ease both; }
-</style>
+        /* Range chips for challenge */
+        .range-nav { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 4px; scrollbar-width: none; }
+        .range-chip { flex-shrink: 0; padding: 7px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; transition: all 0.15s; }
+        .range-chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+    </style>
 </head>
 <body>
 
-<div class="hdr">
-  <div class="logo" onclick="location.reload()">CHALLENGE<br><span>ELITE</span></div>
-  <div class="hdr-right">
-    <button class="hbtn" onclick="exportExcel()">📤 Excel</button>
-    <div class="chip" onclick="openModal()">
-      <span class="chip-lbl">MAQSAD</span>
-      <span class="chip-val" id="target-label-val">30</span>
-      <span class="chip-ico">⚙</span>
+    <!-- HEADER -->
+    <div class="app-header">
+        <div class="app-title">CHALLENGE<span>.</span></div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="exportExcel()" title="Excel">📤</button>
+            <button class="icon-btn" onclick="fullRestart()" title="Reset" style="color:var(--red)">🔄</button>
+            <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+        </div>
     </div>
-    <button class="hbtn" id="theme-btn" onclick="toggleTheme()">🌙</button>
-    <button class="hbtn danger" onclick="fullRestart()">↺</button>
-  </div>
-</div>
 
-<div class="overlay" id="modal-overlay" onclick="closeModalOutside(event)">
-  <div class="modal">
-    <h2>⚙️ Sozlamalar</h2>
-    <div class="mf">
-      <label>Challenge necha kun?</label>
-      <input type="number" id="m-days" placeholder="30" min="1">
+    <!-- DASHBOARD -->
+    <div class="dashboard" id="dashboard">
+        <div class="dash-top">
+            <div>
+                <div class="dash-label" id="main-display-label">UMUMIY BALANS</div>
+                <div class="dash-amount" id="main-display-amount">0 UZS</div>
+                <div class="dash-amount-label">so'm</div>
+            </div>
+            <div class="target-pill" onclick="editChallengeSettings()">
+                <small>MAQSAD</small>
+                <b id="target-label">100</b>
+                <small style="font-size:8px; opacity:0.5">kun ⚙️</small>
+            </div>
+        </div>
+        <div class="prog-wrap" id="prog-wrap" style="display:none">
+            <div class="prog-bar-bg"><div class="prog-bar-fill" id="prog-bar" style="width:0%"></div></div>
+            <div class="prog-info">
+                <span id="prog-text-left">0 / 0</span>
+                <span id="prog-text-right">0%</span>
+            </div>
+        </div>
+        <div id="overall-status"></div>
+        <div class="stats-row" id="stats-row">
+            <div class="stat-mini green"><b id="s-inc">0</b><small>Tushum</small></div>
+            <div class="stat-mini red"><b id="s-exp">0</b><small>Xarajat</small></div>
+            <div class="stat-mini yellow"><b id="s-work-profit">0</b><small>Foyda</small></div>
+            <div class="stat-mini"><b id="s-ord">0</b><small>Order</small></div>
+            <div class="stat-mini"><b id="s-word">0</b><small>Lug'at</small></div>
+            <div class="stat-mini"><b id="s-hrs">0</b><small>Soat</small></div>
+            <div class="stat-mini"><b id="s-avg-ord">0</b><small>Avg/Ord</small></div>
+            <div class="stat-mini"><b id="s-avg-hr">0</b><small>Avg/Soat</small></div>
+            <div class="stat-mini"><b id="s-plan">0</b><small>Kutilgan</small></div>
+        </div>
     </div>
-    <div class="mf">
-      <label>Jami order maqsadi</label>
-      <input type="number" id="m-orders" placeholder="2000" min="1">
+
+    <!-- NAV -->
+    <div class="nav-wrap">
+        <div class="nav-scroll" id="main-nav">
+            <div class="nav-chip active" onclick="showMain(this)">💰 ASOSIY</div>
+            <div class="nav-chip" onclick="showChallenge(this)">⚡ CHALLENGE</div>
+            <div class="nav-chip" onclick="showWords(this)">📖 LUG'AT</div>
+        </div>
     </div>
-    <div class="mactions">
-      <button class="mbtn-cancel" onclick="closeModal()">Bekor</button>
-      <button class="mbtn-save" onclick="saveModal()">✓ Saqlash</button>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- MAIN SECTION -->
+        <div class="section active" id="sec-main">
+            <button id="toggle-sys-btn" class="sys-btn" onclick="toggleLugatSystem()"></button>
+
+            <!-- Motivation -->
+            <div class="motive-banner" id="motive-banner">
+                <div class="icon">🔥</div>
+                <div>
+                    <h4>Buguni kuchli o'ting!</h4>
+                    <p>Har bir order — maqsadga bir qadam yaqinroq.</p>
+                </div>
+            </div>
+
+            <div class="wallet-card">
+                <h3>💳 Hamyon</h3>
+                <div class="field"><label>Summa</label><input type="number" id="w-amt" placeholder="0 UZS" inputmode="numeric"></div>
+                <div class="field"><label>Izoh</label><input type="text" id="w-msg" placeholder="Sabab..."></div>
+                <div class="btn-row">
+                    <button class="btn-inc" onclick="addW('inc')">+ KIRIM</button>
+                    <button class="btn-exp" onclick="addW('exp')">− CHIQIM</button>
+                </div>
+            </div>
+
+            <div id="wallet-history-wrap">
+                <div class="sec-header" style="margin-top:6px">
+                    <h2 style="font-size:15px">So'nggi harakatlar</h2>
+                </div>
+                <div id="wallet-history"></div>
+            </div>
+        </div>
+
+        <!-- CHALLENGE SECTION -->
+        <div class="section" id="sec-challenge">
+            <div class="range-nav" id="range-nav"></div>
+            <div id="card-container"></div>
+        </div>
+
+        <!-- WORDS SECTION -->
+        <div class="section" id="sec-words">
+            <div class="sec-header">
+                <h2>📖 So'zlar</h2>
+                <button class="sec-action" onclick="downloadTXT()">💾 TXT</button>
+            </div>
+            <div id="words-container"></div>
+        </div>
+
     </div>
-  </div>
-</div>
 
-<div class="wrap">
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
 
-  <div class="hero">
-    <div class="hero-lbl"><span class="dot"></span><span id="main-display-label">UMUMIY BALANS</span></div>
-    <div class="hero-amt"><span id="main-display-amount">0</span><span class="hero-cur">UZS</span></div>
-    <div class="prog-label" id="prog-text">0 / 0 · 0%</div>
-    <div class="prog-track" id="prog-cont"><div class="prog-fill" id="prog-bar"></div></div>
-    <div class="ov-status" id="overall-status-box"></div>
-    <div class="stats-panel" id="ish-stats-panel">
-      <div class="sbox"><small>Ish Foydasi</small><b id="s-work-profit">0</b></div>
-      <div class="sbox"><small>Order</small><b id="s-ord">0</b></div>
-      <div class="sbox"><small>Lug'at</small><b id="s-word">0</b></div>
-      <div class="sbox"><small>Kutilgan</small><b id="s-plan">0</b></div>
-      <div class="sbox"><small>Tushum</small><b id="s-inc">0</b></div>
-      <div class="sbox"><small>Xarajat</small><b id="s-exp">0</b></div>
-      <div class="sbox"><small>AVG Ord</small><b id="s-avg-ord">0</b></div>
-      <div class="sbox"><small>AVG/Soat</small><b id="s-avg-hr">0</b></div>
-      <div class="sbox"><small>Soat</small><b id="s-hrs">0.0</b></div>
-    </div>
-  </div>
+    <script>
+        // ===== THEME =====
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-btn').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
 
-  <div class="nav" id="nav-container"></div>
+        function toggleTheme() {
+            const cur = document.documentElement.getAttribute('data-theme');
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            document.getElementById('theme-btn').textContent = next === 'dark' ? '☀️' : '🌙';
+        }
 
-  <div id="sec-main" class="sec on">
-    <button id="toggle-sys-btn" class="sys-btn" onclick="toggleLugat()"></button>
-    <div class="wcard">
-      <div class="fl" style="margin-bottom:10px"><label>Summa</label><input type="number" id="w-amt" placeholder="0" min="1" inputmode="numeric"></div>
-      <div class="fl"><label>Izoh</label><input type="text" id="w-msg" placeholder="Sabab..."></div>
-      <div class="wbtns">
-        <button class="winc" onclick="addW('inc')">＋ KIRIM</button>
-        <button class="wexp" onclick="addW('exp')">－ CHIQIM</button>
-      </div>
-    </div>
-    <div class="stitle">Oxirgi Tranzaksiyalar</div>
-    <div id="wallet-history"></div>
-  </div>
+        // ===== DB =====
+        let db = JSON.parse(localStorage.getItem('chal_elite_v1')) || {
+            cards: {}, wallet: [], lugatEnabled: true, target: 100, orderTarget: 2000
+        };
+        let currentSection = 'main';
+        let currentRange = { s: 1, e: 20 };
 
-  <div id="sec-challenge" class="sec"><div id="card-container"></div></div>
+        // ===== INIT =====
+        function init() {
+            updateSystemUI();
+            updateMotivation();
+            update();
+            renderHistory();
+            buildRangeNav();
+        }
 
-  <div id="sec-words" class="sec">
-    <button class="dl-btn" onclick="downloadTXT()">📁 Lug'atni TXT sifatida yuklab olish</button>
-    <div id="words-container"></div>
-  </div>
+        function buildRangeNav() {
+            const nav = document.getElementById('range-nav');
+            nav.innerHTML = '';
+            for (let i = 1; i <= db.target; i += 20) {
+                let end = Math.min(i + 19, db.target);
+                const chip = document.createElement('div');
+                chip.className = 'range-chip' + (i === 1 ? ' active' : '');
+                chip.textContent = `${i}–${end}`;
+                const _i = i, _e = end;
+                chip.onclick = () => {
+                    document.querySelectorAll('.range-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    currentRange = { s: _i, e: _e };
+                    renderCards(_i, _e);
+                    update();
+                };
+                nav.appendChild(chip);
+            }
+        }
 
-  <div id="sec-stats" class="sec">
-    <div class="stgrid">
-      <div class="stcard"><span class="stlab">Bugungi Foyda</span><span class="stval" id="today-p">0</span><small id="today-diff"></small></div>
-      <div class="stcard"><span class="stlab">O'rtacha Daromad</span><span class="stval" id="avg-daily-profit">0</span><small class="stlab" style="display:block;margin-top:2px">kunlik</small></div>
-      <div class="stcard full"><span class="stlab">Bashorat (Qolgan kun)</span><span class="stval" id="predict-days" style="font-size:24px">---</span><small class="stlab" style="display:block;margin-top:2px">Order maqsadigacha</small></div>
-    </div>
-    <div class="chcard"><div class="chtitle">Foyda va Xarajat · Oxirgi 30 kun</div><canvas id="comboChart"></canvas></div>
-    <div class="chcard"><div class="chtitle">Orderlar · Oxirgi 30 kun</div><canvas id="orderChart"></canvas></div>
-  </div>
+        // ===== NAV =====
+        function showMain(el) {
+            switchSection('main', el);
+            document.getElementById('main-display-label').textContent = 'UMUMIY BALANS';
+            document.getElementById('stats-row').style.display = 'none';
+            document.getElementById('prog-wrap').style.display = 'none';
+            document.getElementById('overall-status').innerHTML = '';
+        }
+        function showChallenge(el) {
+            switchSection('challenge', el);
+            document.getElementById('main-display-label').textContent = 'ISHDAGI SOF FOYDA';
+            document.getElementById('stats-row').style.display = 'grid';
+            document.getElementById('prog-wrap').style.display = 'block';
+            renderCards(currentRange.s, currentRange.e);
+            update();
+        }
+        function showWords(el) {
+            switchSection('words', el);
+            document.getElementById('stats-row').style.display = 'none';
+            document.getElementById('prog-wrap').style.display = 'none';
+            document.getElementById('overall-status').innerHTML = '';
+            renderWords();
+        }
+        function switchSection(name, el) {
+            currentSection = name;
+            document.querySelectorAll('.nav-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('sec-' + name).classList.add('active');
+        }
 
-</div>
+        // ===== UPDATE =====
+        function update() {
+            let workInc = 0, workExp = 0, ord = 0, word = 0, hrs = 0, tPlan = 0, activeDays = 0;
+            Object.values(db.cards).forEach(v => {
+                workInc += Number(v.i || 0); workExp += Number(v.x || 0);
+                ord += Number(v.o || 0); word += Number(v.w || 0);
+                tPlan += Number(v.p || 0);
+                if (v.lock && v.o !== undefined && v.o !== '') activeDays++;
+                if (v.s && v.e) {
+                    let [sh, sm] = v.s.split(':').map(Number);
+                    let [eh, em] = v.e.split(':').map(Number);
+                    if (!isNaN(sh) && !isNaN(eh)) { let d = (eh + em / 60) - (sh + sm / 60); if (d > 0) hrs += d; }
+                }
+            });
 
-<script>
-let comboChart=null,orderChart=null;
-let db=JSON.parse(localStorage.getItem('chal_v_final_30'))||{cards:{},wallet:[],lugatEnabled:true,target:30,orderTarget:2000};
-let currentRange={s:1,e:20};
+            let goal = db.orderTarget || 1;
+            let percent = (ord / goal) * 100;
+            document.getElementById('prog-bar').style.width = Math.min(percent, 100) + '%';
+            document.getElementById('prog-text-left').textContent = `${ord} / ${goal}`;
+            document.getElementById('prog-text-right').textContent = `${percent.toFixed(1)}%`;
 
-function init(){
-  const t=localStorage.getItem('theme')||'dark';
-  document.documentElement.setAttribute('data-theme',t);
-  updateThemeBtn(t);
-  document.getElementById('target-label-val').innerText=db.target;
-  updateSysUI();renderNav();update();renderHistory();
-}
+            // Overall status
+            const ovStat = document.getElementById('overall-status');
+            let dailyNorm = db.orderTarget / db.target;
+            let expectedNow = dailyNorm * activeDays;
+            if (activeDays > 0) {
+                let diff = ord - expectedNow;
+                if (diff > 0) ovStat.innerHTML = `<span class="status-pill status-ahead">🚀 REJADAN OLDINDASIZ (+${diff.toFixed(0)})</span>`;
+                else if (diff < 0) ovStat.innerHTML = `<span class="status-pill status-behind">⚠️ REJADAN ORTDASIZ (${diff.toFixed(0)})</span>`;
+                else ovStat.innerHTML = `<span class="status-pill status-ok">✅ REJA BO'YICHA KETYAPSIZ</span>`;
+            } else {
+                ovStat.innerHTML = '';
+            }
 
-function toggleTheme(){
-  const cur=document.documentElement.getAttribute('data-theme');
-  const next=cur==='dark'?'light':'dark';
-  document.documentElement.setAttribute('data-theme',next);
-  localStorage.setItem('theme',next);
-  updateThemeBtn(next);
-  if(document.getElementById('sec-stats').classList.contains('on'))renderCharts();
-}
-function updateThemeBtn(t){document.getElementById('theme-btn').innerText=t==='dark'?'☀️':'🌙';}
+            // Amount display
+            let walletNet = db.wallet.reduce((a, b) => b.t === 'inc' ? a + b.a : a - b.a, 0);
+            let profit = workInc - workExp;
+            let displayVal = currentSection === 'main' ? (walletNet + profit) : profit;
+            document.getElementById('main-display-amount').textContent = fmt(displayVal) + ' UZS';
+            document.getElementById('target-label').textContent = db.target;
 
-/* Modal settings */
-function openModal(){
-  document.getElementById('m-days').value=db.target;
-  document.getElementById('m-orders').value=db.orderTarget;
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function closeModal(){document.getElementById('modal-overlay').classList.remove('open');}
-function closeModalOutside(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
-function saveModal(){
-  const d=parseInt(document.getElementById('m-days').value);
-  const o=parseInt(document.getElementById('m-orders').value);
-  if(d&&d>0)db.target=d;
-  if(o&&o>0)db.orderTarget=o;
-  document.getElementById('target-label-val').innerText=db.target;
-  sync();renderNav();closeModal();
-}
+            document.getElementById('s-work-profit').textContent = fmt(profit);
+            document.getElementById('s-ord').textContent = ord;
+            document.getElementById('s-word').textContent = word;
+            document.getElementById('s-plan').textContent = fmt(tPlan);
+            document.getElementById('s-inc').textContent = fmt(workInc);
+            document.getElementById('s-exp').textContent = fmt(workExp);
+            document.getElementById('s-avg-ord').textContent = fmt(ord > 0 ? Math.round(workInc / ord) : 0);
+            document.getElementById('s-avg-hr').textContent = fmt(hrs > 0 ? Math.round(workInc / hrs) : 0);
+            document.getElementById('s-hrs').textContent = hrs.toFixed(1);
 
-/* Nav tabs generator */
-function renderNav(){
-  const nav=document.getElementById('nav-container');
-  let h=`<div class="np active" id="nav-main" onclick="showTab('main',this)">HAMYON</div>`;
-  h+=`<div class="np" id="nav-stats" onclick="showTab('stats',this)">STATISTIKA</div>`;
-  if(db.lugatEnabled)h+=`<div class="np" id="nav-words" onclick="showTab('words',this)">LUG'AT</div>`;
-  for(let i=1;i<=db.target;i+=20){
-    let e=Math.min(i+19,db.target);
-    h+=`<div class="np" onclick="showTab('c',this,${i},${e})">${i}–${e}</div>`;
-  }
-  nav.innerHTML=h;
-}
+            // Confetti if 100%
+            if (percent >= 100 && !db._confettiDone) {
+                db._confettiDone = true;
+                launchConfetti();
+            }
+        }
 
-function showTab(type,el,s,e){
-  document.querySelectorAll('.np').forEach(n=>n.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('.sec').forEach(sec=>sec.classList.remove('on'));
-  const sp=document.getElementById('ish-stats-panel');
-  const pc=document.getElementById('prog-cont');
-  const pt=document.getElementById('prog-text');
-  const os=document.getElementById('overall-status-box');
-  const hide=()=>{sp.style.display='none';pc.style.display='none';pt.style.display='none';os.style.display='none';};
-  
-  if(type==='main'){
-    document.getElementById('sec-main').classList.add('on');hide();
-    document.getElementById('main-display-label').innerText='UMUMIY BALANS';
-  }else if(type==='stats'){
-    document.getElementById('sec-stats').classList.add('on');hide();renderCharts();
-  }else if(type==='words'){
-    document.getElementById('sec-words').classList.add('on');hide();renderWords();
-  }else{
-    currentRange={s,e};
-    document.getElementById('sec-challenge').classList.add('on');
-    sp.style.display='grid';pc.style.display='block';pt.style.display='block';os.style.display='block';
-    document.getElementById('main-display-label').innerText='ISHDAGI SOF FOYDA';
-    renderCards(s,e);
-  }
-  update();
-}
+        function fmt(n) { return Number(n).toLocaleString('uz-UZ'); }
 
-/* Dictionary toggle activation */
-function toggleLugat(){db.lugatEnabled=!db.lugatEnabled;updateSysUI();renderNav();sync();}
-function updateSysUI(){
-  const btn=document.getElementById('toggle-sys-btn');if(!btn)return;
-  btn.className=db.lugatEnabled?'sys-btn sys-on':'sys-btn sys-off';
-  btn.innerHTML=db.lugatEnabled?"💠 LUG'AT TIZIMI · FAOL":"🚫 LUG'AT TIZIMI · O'CHIQ";
-}
+        // ===== CARDS =====
+        function renderCards(s, e) {
+            const container = document.getElementById('card-container');
+            container.innerHTML = '';
+            const dailyNorm = db.orderTarget / db.target;
+            for (let i = s; i <= e; i++) {
+                let d = db.cards[i] || {};
+                let badgeCls = 'badge-on', badgeTxt = 'REJADA';
+                if (d.o > dailyNorm) { badgeCls = 'badge-up'; badgeTxt = '▲ REJADAN KO\'P'; }
+                else if (d.o < dailyNorm && d.o > 0) { badgeCls = 'badge-dn'; badgeTxt = '▼ ORTDA'; }
 
-/* Rendering Challenge Cards with new look */
-function renderCards(s,e){
-  const c=document.getElementById('card-container');c.innerHTML='';
-  for(let i=s;i<=e;i++){
-    let d=db.cards[i]||{};
-    c.innerHTML+=`
-    <div class="dcard ${d.lock?'locked':''}" id="c-${i}" style="animation-delay:${(i-s)*.04}s">
-      <div class="dcard-top">
-        <div class="dnum"><em>${i}</em>-kun</div>
-        <button class="edit-btn" onclick="unlock(${i})">✎ Tahrirlash</button>
-      </div>
-      <div class="fg">
-        <div class="fl"><label>⏱ Start</label><input type="text" class="t-s" value="${d.s||'08:00'}"></div>
-        <div class="fl"><label>⏱ Finish</label><input type="text" class="t-e" value="${d.e||'22:00'}"></div>
-        <div class="fl"><label>📦 Order</label><input type="number" class="v-o" value="${d.o||''}" oninput="autoPlan(${i},this.value)" inputmode="numeric"></div>
-        <div class="fl"><label>✅ Lug'at</label><input type="number" class="v-w" value="${d.w||0}" ${db.lugatEnabled?'readonly':''}></div>
-        <div class="fl"><label style="color:var(--acc)">🎯 Kutilgan</label><input type="number" class="v-p" value="${d.p||''}" inputmode="numeric"></div>
-        <div class="fl"><label>💰 Tushum</label><input type="number" class="v-i" value="${d.i||''}" oninput="liveProfit(${i})" inputmode="numeric"></div>
-        <div class="fl" style="grid-column:span 2"><label>💸 Xarajat</label><input type="number" class="v-x" value="${d.x||''}" oninput="liveProfit(${i})" inputmode="numeric"></div>
-        <div class="profit-row"><small>FOYDA</small><b class="live-p">${(Number(d.i||0)-Number(d.x||0)).toLocaleString()}</b></div>
-      </div>
-      <button class="save-btn" onclick="saveChallenge(${i})">✓ Saqlash va Qulflash</button>
-    </div>`;
-  }
-}
+                let profit = Number(d.i || 0) - Number(d.x || 0);
+                const card = document.createElement('div');
+                card.className = `day-card ${d.lock ? 'locked' : ''}`;
+                card.id = `c-${i}`;
+                card.innerHTML = `
+                    <div class="card-head">
+                        <h3>${d.day_name || i + '-kun'}</h3>
+                        <span class="badge ${badgeCls}">${badgeTxt}</span>
+                        <button class="edit-btn" onclick="unlock(${i})">✏️ TAHRIR</button>
+                    </div>
+                    <div class="card-grid">
+                        <div class="field"><label>⏰ Start</label><input type="text" class="t-s" value="${d.s || '08:00'}"></div>
+                        <div class="field"><label>🏁 Finish</label><input type="text" class="t-e" value="${d.e || '22:00'}"></div>
+                        <div class="field"><label>📦 Order</label><input type="number" class="v-o" value="${d.o || ''}" inputmode="numeric" oninput="autoPlan(${i}, this.value)"></div>
+                        <div class="field"><label>✅ Lug'at</label><input type="number" class="v-w" value="${d.w || 0}" inputmode="numeric" ${db.lugatEnabled ? 'readonly' : ''}></div>
+                        <div class="field"><label style="color:var(--accent)">🎯 Kutilgan</label><input type="number" class="v-p" value="${d.p || ''}" inputmode="numeric"></div>
+                        <div class="field"><label>💰 Tushum</label><input type="number" class="v-i" value="${d.i || ''}" inputmode="numeric"></div>
+                        <div class="field"><label>💸 Xarajat</label><input type="number" class="v-x" value="${d.x || ''}" inputmode="numeric"></div>
+                        <div class="profit-box"><small>Kunlik foyda</small><b style="color:${profit >= 0 ? 'var(--green)' : 'var(--red)'}">${fmt(profit)}</b></div>
+                    </div>
+                    <button class="save-btn" onclick="saveChallenge(${i})">💾 SAQLASH VA QULFLASH</button>`;
+                container.appendChild(card);
+            }
+        }
 
-function autoPlan(i,v){
-  const el=document.getElementById('c-'+i);if(!el)return;
-  const p=el.querySelector('.v-p');if(p)p.value=v*15000;
-}
+        function autoPlan(i, v) {
+            const el = document.getElementById('c-' + i);
+            if (el) { const p = el.querySelector('.v-p'); if (p) p.value = v * 15000; }
+        }
 
-function liveProfit(i){
-  const el=document.getElementById('c-'+i);if(!el)return;
-  const inc=Number(el.querySelector('.v-i').value)||0;
-  const exp=Number(el.querySelector('.v-x').value)||0;
-  el.querySelector('.live-p').innerText=(inc-exp).toLocaleString();
-}
+        function unlock(i) {
+            const el = document.getElementById('c-' + i);
+            el.classList.remove('locked');
+            el.classList.add('editing');
+        }
 
-function unlock(i){
-  const el=document.getElementById('c-'+i);
-  if(el){el.classList.remove('locked');el.classList.add('editing');}
-}
+        function saveChallenge(i) {
+            const el = document.getElementById('c-' + i);
+            db.cards[i] = {
+                ...db.cards[i],
+                s: el.querySelector('.t-s').value,
+                e: el.querySelector('.t-e').value,
+                o: el.querySelector('.v-o').value,
+                w: el.querySelector('.v-w').value,
+                p: el.querySelector('.v-p').value,
+                i: el.querySelector('.v-i').value,
+                x: el.querySelector('.v-x').value,
+                lock: true
+            };
+            sync();
+            renderCards(currentRange.s, currentRange.e);
+            showToast('✅ Saqlandi!');
+        }
 
-function saveChallenge(i){
-  const el=document.getElementById('c-'+i);if(!el)return;
-  db.cards[i]={
-    ...db.cards[i],
-    s:el.querySelector('.t-s').value,
-    e:el.querySelector('.t-e').value,
-    o:el.querySelector('.v-o').value,
-    w:el.querySelector('.v-w').value,
-    p:el.querySelector('.v-p').value,
-    i:el.querySelector('.v-i').value,
-    x:el.querySelector('.v-x').value,
-    lock:true
-  };
-  sync();renderCards(currentRange.s,currentRange.e);
-}
+        // ===== WORDS =====
+        function renderWords() {
+            const container = document.getElementById('words-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= db.target; i++) {
+                let d = db.cards[i] || {};
+                const card = document.createElement('div');
+                card.className = 'words-card';
+                card.innerHTML = `
+                    <h3>${d.day_name || i + '-kun'}</h3>
+                    <textarea placeholder="So'zlarni kiriting..." oninput="saveWords(${i}, this.value)">${d.slovar || ''}</textarea>
+                    <div class="word-count">${(d.slovar || '').split('\n').filter(l => l.trim()).length} ta so'z</div>`;
+                container.appendChild(card);
+            }
+        }
 
-/* Words dynamic processing */
-function renderWords(){
-  const c=document.getElementById('words-container');c.innerHTML='';
-  for(let i=1;i<=db.target;i++){
-    let d=db.cards[i]||{};
-    c.innerHTML+=`<div class="wdcard" style="animation-delay:${(i-1)*.025}s"><strong><em>${i}</em>-kun</strong><textarea oninput="saveWords(${i},this.value)" spellcheck="false">${d.slovar||''}</textarea></div>`;
-  }
-}
+        function saveWords(i, v) {
+            if (!db.cards[i]) db.cards[i] = {};
+            db.cards[i].slovar = v;
+            db.cards[i].w = v.split('\n').filter(l => l.trim()).length;
+            const wc = document.querySelectorAll('.word-count')[i - 1];
+            if (wc) wc.textContent = db.cards[i].w + ' ta so\'z';
+            sync();
+        }
 
-function saveWords(i,v){
-  if(!db.cards[i])db.cards[i]={};
-  db.cards[i].slovar=v;
-  db.cards[i].w=v.split('\n').filter(l=>l.trim()).length;
-  localStorage.setItem('chal_v_final_30',JSON.stringify(db));
-  update();
-}
+        // ===== WALLET =====
+        function addW(t) {
+            let a = parseInt(document.getElementById('w-amt').value);
+            if (!a) return;
+            db.wallet.push({ id: Date.now(), a, t, m: document.getElementById('w-msg').value || 'Izohsiz' });
+            document.getElementById('w-amt').value = '';
+            document.getElementById('w-msg').value = '';
+            sync();
+            renderHistory();
+            showToast(t === 'inc' ? '💚 Kirim qo\'shildi!' : '❤️ Chiqim qo\'shildi!');
+        }
 
-function downloadTXT(){
-  let txt="LUG'ATLAR\n\n";
-  Object.keys(db.cards).sort((a,b)=>a-b).forEach(k=>{if(db.cards[k].slovar)txt+=`${k}-kun:\n${db.cards[k].slovar}\n\n`;});
-  const blob=new Blob(['\ufeff'+txt],{type:'text/plain'});
-  const a=document.createElement('a');a.download='Lugat.txt';a.href=URL.createObjectURL(blob);a.click();
-}
+        function renderHistory() {
+            const div = document.getElementById('wallet-history');
+            div.innerHTML = '';
+            const items = [...db.wallet].reverse().slice(0, 8);
+            if (items.length === 0) {
+                div.innerHTML = `<div class="empty-state"><span class="emoji">💸</span><p>Hali harakatlar yo'q.<br>Kirim yoki chiqim qo'shing.</p></div>`;
+                return;
+            }
+            items.forEach(h => {
+                div.innerHTML += `
+                    <div class="hist-item">
+                        <div class="meta">
+                            <b>${h.m}</b>
+                            <small style="color:${h.t === 'inc' ? 'var(--green)' : 'var(--red)'}">${h.t === 'inc' ? '+' : '−'}${fmt(h.a)} UZS</small>
+                        </div>
+                        <button class="hist-del" onclick="delW(${h.id})">🗑️</button>
+                    </div>`;
+            });
+        }
 
-/* Wallet control */
-function addW(t){
-  let a=parseInt(document.getElementById('w-amt').value);if(!a||a<=0)return;
-  db.wallet.push({id:Date.now(),a,t,m:document.getElementById('w-msg').value||'Izohsiz'});
-  document.getElementById('w-amt').value='';document.getElementById('w-msg').value='';
-  sync();renderHistory();
-}
+        function delW(id) {
+            db.wallet = db.wallet.filter(w => w.id !== id);
+            sync(); renderHistory();
+        }
 
-function renderHistory(){
-  const div=document.getElementById('wallet-history');if(!div)return;div.innerHTML='';
-  [...db.wallet].reverse().slice(0,5).forEach(h=>{
-    div.innerHTML+=`<div class="hist-item"><div><div class="hist-msg">${h.m}</div><div class="hist-amt" style="color:${h.t==='inc'?'var(--grn)':'var(--red)'}">${h.t==='inc'?'＋':'－'}${h.a.toLocaleString()} UZS</div></div><button class="del-btn" onclick="delW(${h.id})">🗑</button></div>`;
-  });
-}
-function delW(id){db.wallet=db.wallet.filter(w=>w.id!==id);sync();renderHistory();}
+        // ===== SYSTEM =====
+        function toggleLugatSystem() { db.lugatEnabled = !db.lugatEnabled; updateSystemUI(); sync(); }
+        function updateSystemUI() {
+            const btn = document.getElementById('toggle-sys-btn');
+            if (btn) {
+                btn.className = db.lugatEnabled ? 'sys-btn sys-on' : 'sys-btn sys-off';
+                btn.textContent = db.lugatEnabled ? "💠 LUG'AT TIZIMI: FAOL" : "🚫 LUG'AT TIZIMI: O'CHIQ";
+            }
+        }
 
-/* Sync, Calculations and Updates */
-function sync(){localStorage.setItem('chal_v_final_30',JSON.stringify(db));update();}
-function fullRestart(){if(confirm("Barcha ma'lumotlar o'chirilsinmi?")){localStorage.clear();location.reload();}}
+        function updateMotivation() {
+            const msgs = [
+                { icon: '🔥', title: 'Buguni kuchli o\'ting!', body: 'Har bir order — maqsadga bir qadam yaqinroq.' },
+                { icon: '⚡', title: 'Energiya to\'la ish!', body: 'Bugun challenge rekordini yangilash vaqti.' },
+                { icon: '🏆', title: 'Champion fikrlaydi!', body: 'Qiyin kunlar kuchli odamlar yaratadi.' },
+                { icon: '💪', title: 'Hech qachon to\'xtama!', body: 'Har bir so\'z, har bir order — sen uchun.' },
+                { icon: '🚀', title: 'Yuqoriga uchramiz!', body: 'Maqsad aniq — yo\'l ham aniq.' },
+            ];
+            const m = msgs[new Date().getDay() % msgs.length];
+            const b = document.getElementById('motive-banner');
+            if (b) b.innerHTML = `<div class="icon">${m.icon}</div><div><h4>${m.title}</h4><p>${m.body}</p></div>`;
+        }
 
-function update(){
-  let workInc=0,workExp=0,ord=0,word=0,hrs=0,tPlan=0,activeDays=0;
-  Object.values(db.cards).forEach(v=>{
-    workInc+=Number(v.i||0);workExp+=Number(v.x||0);ord+=Number(v.o||0);word+=Number(v.w||0);tPlan+=Number(v.p||0);
-    if(v.lock)activeDays++;
-    if(v.s&&v.e){let[sh,sm]=v.s.split(':').map(Number),[eh,em]=v.e.split(':').map(Number);let d=(eh+em/60)-(sh+sm/60);if(d>0)hrs+=d;}
-  });
-  
-  const goal=db.orderTarget||1,pct=(ord/goal)*100;
-  document.getElementById('prog-bar').style.width=Math.min(pct,100)+'%';
-  document.getElementById('prog-text').innerText=`${ord} / ${goal} · ${pct.toFixed(1)}%`;
-  
-  const os=document.getElementById('overall-status-box');
-  if(activeDays>0){
-    let exp=(db.orderTarget/db.target)*activeDays,diff=ord-exp;
-    os.innerHTML=`<span class="spill ${diff>=0?'sup':'sdn'}">${diff>=0?'🚀 REJADAN OLDIN':'⚠️ ORTDA'} (${diff.toFixed(0)})</span>`;
-  }
-  
-  const lbl=document.getElementById('main-display-label').innerText;
-  const wn=db.wallet.reduce((a,b)=>b.t==='inc'?a+b.a:a-b.a,0),profit=workInc-workExp;
-  document.getElementById('main-display-amount').innerText=(lbl==='UMUMIY BALANS'?wn+profit:profit).toLocaleString();
-  
-  document.getElementById('s-work-profit').innerText=profit.toLocaleString();
-  document.getElementById('s-ord').innerText=ord;document.getElementById('s-word').innerText=word;
-  document.getElementById('s-plan').innerText=tPlan.toLocaleString();document.getElementById('s-inc').innerText=workInc.toLocaleString();
-  document.getElementById('s-exp').innerText=workExp.toLocaleString();
-  document.getElementById('s-avg-ord').innerText=ord>0?Math.round(workInc/ord).toLocaleString():0;
-  document.getElementById('s-avg-hr').innerText=hrs>0?Math.round(workInc/hrs).toLocaleString():0;
-  document.getElementById('s-hrs').innerText=hrs.toFixed(1);
-}
+        function editChallengeSettings() {
+            let days = prompt("Challenge necha kun?", db.target);
+            let ords = prompt("Jami order maqsadi:", db.orderTarget);
+            if (days) db.target = parseInt(days);
+            if (ords) db.orderTarget = parseInt(ords);
+            sync();
+            buildRangeNav();
+            update();
+        }
 
-/* Charts render system */
-function renderCharts(){
-  let labels=[],pD=[],eD=[],oD=[],totalP=0,activeC=0,totalO=0;
-  const all=Object.keys(db.cards).map(Number).sort((a,b)=>a-b);
-  const adl=all.filter(d=>db.cards[d].lock);
-  const l30=adl.slice(-30);
-  
-  adl.forEach(day=>{
-    const d=db.cards[day],p=Number(d.i||0)-Number(d.x||0);
-    totalP+=p;totalO+=Number(d.o||0);activeC++;
-    if(l30.includes(day)){labels.push(day+'-k');pD.push(p);eD.push(Number(d.x||0));oD.push(Number(d.o||0));}
-  });
-  
-  const avgP=activeC>0?totalP/activeC:0;
-  document.getElementById('avg-daily-profit').innerText=Math.round(avgP).toLocaleString()+' UZS';
-  
-  const ld=adl.slice(-1)[0];
-  const todayP=ld?Number(db.cards[ld].i||0)-Number(db.cards[ld].x||0):0;
-  document.getElementById('today-p').innerText=todayP.toLocaleString()+' UZS';
-  
-  const de=document.getElementById('today-diff');
-  if(avgP>0){
-    const pct=((todayP-avgP)/avgP)*100;de.className=pct>=0?'tu':'td';
-    de.innerText=`${pct>=0?'▲':'▼'} ${Math.abs(pct).toFixed(1)}%`;
-  }
-  
-  if(totalO>0&&activeC>0){
-    const sp=totalO/activeC,dl=Math.ceil((db.orderTarget-totalO)/sp);
-    document.getElementById('predict-days').innerText=(dl>0?dl:0)+' kun';
-  }
-  
-  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-  const tc=isDark?'#8a8a9a':'#7c6e65',gc=isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';
-  
-  // Har 50000 qadamlik o'q konfiguratsiyasi
-  const opts={
-    responsive:true,
-    plugins:{legend:{labels:{color:tc,font:{family:'DM Mono',size:11}}}},
-    scales:{
-      y:{ticks:{color:tc,font:{family:'DM Mono',size:10},stepSize:50000},grid:{color:gc},border:{color:'transparent'}},
-      x:{ticks:{color:tc,font:{family:'DM Mono',size:10}},grid:{color:'transparent'},border:{color:'transparent'}}
-    }
-  };
-  
-  if(comboChart)comboChart.destroy();
-  comboChart=new Chart(document.getElementById('comboChart'),{
-    type:'line',
-    data:{
-      labels,
-      datasets:[
-        {label:'Foyda',data:pD,borderColor:'#ff6b35',backgroundColor:'rgba(255,107,53,.09)',tension:.4,fill:true,borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#ff6b35'},
-        {label:'Xarajat',data:eD,borderColor:'#e84393',backgroundColor:'rgba(232,67,147,.07)',tension:.4,fill:true,borderWidth:2,pointRadius:3,pointBackgroundColor:'#e84393'}
-      ]
-    },
-    options:opts
-  });
-  
-  if(orderChart)orderChart.destroy();
-  orderChart=new Chart(document.getElementById('orderChart'),{
-    type:'bar',
-    data:{
-      labels,
-      datasets:[{label:'Orderlar',data:oD,backgroundColor:'rgba(0,184,148,.7)',borderRadius:6,borderSkipped:false}]
-    },
-    options:opts
-  });
-}
+        function fullRestart() {
+            if (confirm("Diqqat! Barcha ma'lumotlar butunlay o'chib ketadi. Rozimisiz?")) {
+                localStorage.removeItem('chal_elite_v1');
+                location.reload();
+            }
+        }
 
-/* Excel export logic */
-function exportExcel(){
-  let data=[["Kun","Order","Lug'at","Kutilgan","Tushum","Xarajat","Foyda"]];
-  Object.keys(db.cards).sort((a,b)=>a-b).forEach(k=>{let d=db.cards[k];data.push([k,d.o||0,d.w||0,d.p||0,d.i||0,d.x||0,(Number(d.i||0)-Number(d.x||0))]);});
-  let ws=XLSX.utils.aoa_to_sheet(data),wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Hisobot');XLSX.writeFile(wb,'ChallengeReport.xlsx');
-}
+        // ===== EXPORT =====
+        function downloadTXT() {
+            let txt = "CHALLENGE LUG'ATLAR RO'YXATI\n\n";
+            Object.keys(db.cards).sort((a, b) => a - b).forEach(k => {
+                if (db.cards[k].slovar) txt += `--- ${k}-KUN ---\n${db.cards[k].slovar}\n\n`;
+            });
+            const blob = new Blob(['\ufeff' + txt], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a');
+            a.download = 'Lugat_Challenge.txt';
+            a.href = URL.createObjectURL(blob);
+            a.click();
+        }
 
-init();
-</script>
+        function exportExcel() {
+            if (typeof XLSX === 'undefined') {
+                // Fallback: export as CSV
+                let csv = "Kun,Start,Finish,Order,Lug'at,Kutilgan Foyda,Tushum,Xarajat,Sof Foyda\n";
+                Object.keys(db.cards).sort((a, b) => a - b).forEach(k => {
+                    let d = db.cards[k];
+                    csv += `${k},${d.s||''},${d.e||''},${d.o||0},${d.w||0},${d.p||0},${d.i||0},${d.x||0},${Number(d.i||0)-Number(d.x||0)}\n`;
+                });
+                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+                const a = document.createElement('a');
+                a.download = 'Challenge_Report.csv';
+                a.href = URL.createObjectURL(blob);
+                a.click();
+                showToast('📊 CSV yuklab olindi!');
+                return;
+            }
+            let data = [["Kun", "Start", "Finish", "Order", "Lug'at", "Kutilgan Foyda", "Tushum", "Xarajat", "Sof Foyda"]];
+            Object.keys(db.cards).sort((a, b) => a - b).forEach(k => {
+                let d = db.cards[k];
+                data.push([k, d.s || '', d.e || '', d.o || 0, d.w || 0, d.p || 0, d.i || 0, d.x || 0, (Number(d.i || 0) - Number(d.x || 0))]);
+            });
+            let ws = XLSX.utils.aoa_to_sheet(data);
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Hisobot");
+            XLSX.writeFile(wb, "Challenge_Report.xlsx");
+            showToast('📊 Excel yuklab olindi!');
+        }
+
+        // ===== SYNC =====
+        function sync() { localStorage.setItem('chal_elite_v1', JSON.stringify(db)); update(); }
+
+        // ===== TOAST =====
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        // ===== CONFETTI =====
+        function launchConfetti() {
+            const colors = ['#ff6b35', '#ffd23f', '#00cec9', '#fd79a8', '#a29bfe', '#55efc4'];
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.className = 'confetti-piece';
+                    el.style.cssText = `left:${Math.random()*100}vw; top:-20px; background:${colors[Math.floor(Math.random()*colors.length)]}; width:${6+Math.random()*8}px; height:${6+Math.random()*8}px; animation-duration:${2+Math.random()*2}s; animation-delay:${Math.random()*1}s;`;
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 4000);
+                }, i * 50);
+            }
+            showToast('🏆 MAQSADGA YETDINGIZ!');
+        }
+
+        init();
+    </script>
 </body>
 </html>
