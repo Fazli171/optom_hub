@@ -1,1009 +1,445 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Challenge Elite ⚡</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        :root {
-            --bg: #f5f0e8;
-            --surface: #ffffff;
-            --surface2: #fdf8f0;
-            --accent: #ff6b35;
-            --accent2: #ffd23f;
-            --green: #00b894;
-            --red: #e84393;
-            --blue: #0984e3;
-            --border: #e0d8cc;
-            --text: #1a1a2e;
-            --muted: #7c6e65;
-            --shadow: 0 2px 20px rgba(0,0,0,0.08);
-            --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
-            --radius: 20px;
-        }
-        [data-theme="dark"] {
-            --bg: #0d0d14;
-            --surface: #16161f;
-            --surface2: #1e1e2a;
-            --accent: #ff6b35;
-            --accent2: #ffd23f;
-            --green: #00cec9;
-            --red: #fd79a8;
-            --blue: #74b9ff;
-            --border: #2d2d3d;
-            --text: #f0eee8;
-            --muted: #8a8a9a;
-            --shadow: 0 2px 20px rgba(0,0,0,0.3);
-            --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
-        
-        body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            padding: 0 0 80px 0;
-            transition: background 0.3s, color 0.3s;
-            min-height: 100vh;
-        }
-
-        /* ===== HEADER ===== */
-        .app-header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--bg);
-            padding: 14px 16px 10px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(12px);
-        }
-        .app-title {
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            font-size: 18px;
-            font-weight: 800;
-            color: var(--text);
-            letter-spacing: -0.5px;
-        }
-        .app-title span { color: var(--accent); }
-        .header-actions { display: flex; gap: 8px; align-items: center; }
-        .icon-btn {
-            width: 36px; height: 36px;
-            border-radius: 10px;
-            border: 1.5px solid var(--border);
-            background: var(--surface);
-            color: var(--text);
-            font-size: 15px;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s;
-            box-shadow: var(--shadow);
-        }
-        .icon-btn:active { transform: scale(0.92); }
-
-        /* ===== DASHBOARD ===== */
-        .dashboard {
-            margin: 16px;
-            background: var(--text);
-            border-radius: 28px;
-            padding: 24px;
-            color: var(--bg);
-            position: relative;
-            overflow: hidden;
-            box-shadow: var(--shadow-lg);
-        }
-        .dashboard::before {
-            content: '';
-            position: absolute;
-            top: -40px; right: -40px;
-            width: 180px; height: 180px;
-            background: var(--accent);
-            border-radius: 50%;
-            opacity: 0.12;
-        }
-        .dashboard::after {
-            content: '';
-            position: absolute;
-            bottom: -60px; left: -30px;
-            width: 200px; height: 200px;
-            background: var(--accent2);
-            border-radius: 50%;
-            opacity: 0.08;
-        }
-        .dash-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-        .dash-label {
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.5;
-        }
-        .dash-amount {
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            font-size: 38px;
-            font-weight: 800;
-            line-height: 1;
-            margin-top: 4px;
-            letter-spacing: -1px;
-        }
-        .dash-amount-label { font-size: 11px; opacity: 0.5; margin-top: 4px; }
-        .target-pill {
-            background: rgba(255,255,255,0.12);
-            border-radius: 12px;
-            padding: 8px 14px;
-            text-align: right;
-            cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-        .target-pill small { font-size: 8px; opacity: 0.5; display: block; text-transform: uppercase; letter-spacing: 1px; }
-        .target-pill b { font-size: 14px; color: var(--accent2); }
-
-        /* Progress bar */
-        .prog-wrap { margin: 16px 0 8px; }
-        .prog-bar-bg { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
-        .prog-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width 1s cubic-bezier(.4,0,.2,1); }
-        .prog-info { display: flex; justify-content: space-between; margin-top: 6px; }
-        .prog-info span { font-size: 10px; opacity: 0.55; font-weight: 600; }
-
-        /* Status badge */
-        .status-pill {
-            display: inline-flex; align-items: center; gap: 5px;
-            font-size: 10px; font-weight: 700;
-            padding: 5px 12px; border-radius: 20px;
-            margin-top: 8px;
-        }
-        .status-ahead { background: rgba(0,206,201,0.2); color: #00cec9; }
-        .status-behind { background: rgba(253,121,168,0.2); color: #fd79a8; }
-        .status-ok { background: rgba(255,210,63,0.2); color: #ffd23f; }
-
-        /* Stats mini */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(3,1fr);
-            gap: 8px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: none;
-        }
-        .stat-mini { text-align: center; }
-        .stat-mini b { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; font-size: 14px; display: block; }
-        .stat-mini small { font-size: 8px; opacity: 0.4; text-transform: uppercase; letter-spacing: 1px; }
-        .stat-mini.green b { color: var(--green); }
-        .stat-mini.red b { color: var(--red); }
-        .stat-mini.yellow b { color: var(--accent2); }
-
-        /* ===== NAV ===== */
-        .nav-wrap { padding: 0 16px; margin: 16px 0; }
-        .nav-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-        .nav-scroll::-webkit-scrollbar { display: none; }
-        .nav-chip {
-            flex-shrink: 0;
-            padding: 9px 18px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            border: 1.5px solid var(--border);
-            background: var(--surface);
-            color: var(--muted);
-            transition: all 0.2s;
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            letter-spacing: 0.3px;
-        }
-        .nav-chip.active {
-            background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
-            box-shadow: 0 4px 16px rgba(255,107,53,0.35);
-        }
-        .nav-chip:active { transform: scale(0.95); }
-
-        /* ===== CONTENT ===== */
-        .content { padding: 0 16px; }
-        .section { display: none; }
-        .section.active { display: block; }
-
-        /* ===== WALLET ===== */
-        .wallet-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 14px;
-            border: 1.5px solid var(--border);
-            box-shadow: var(--shadow);
-        }
-        .wallet-card h3 {
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 14px;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .field { margin-bottom: 12px; }
-        .field label {
-            display: block;
-            font-size: 9px;
-            font-weight: 700;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 6px;
-        }
-        .field input, .field textarea {
-            width: 100%;
-            background: var(--surface2);
-            border: 1.5px solid var(--border);
-            color: var(--text);
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            padding: 12px 14px;
-            border-radius: 12px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .field input:focus, .field textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
-        }
-        .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
-        .btn-inc, .btn-exp {
-            padding: 14px;
-            border: none;
-            border-radius: 14px;
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.15s;
-            letter-spacing: 0.5px;
-        }
-        .btn-inc { background: var(--green); color: #fff; box-shadow: 0 4px 16px rgba(0,206,201,0.3); }
-        .btn-exp { background: var(--red); color: #fff; box-shadow: 0 4px 16px rgba(232,67,147,0.3); }
-        .btn-inc:active, .btn-exp:active { transform: scale(0.96); }
-
-        /* System toggle */
-        .sys-btn {
-            width: 100%;
-            padding: 14px;
-            border-radius: 14px;
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            font-weight: 700;
-            font-size: 12px;
-            cursor: pointer;
-            border: 1.5px solid;
-            margin-bottom: 14px;
-            letter-spacing: 0.5px;
-            transition: all 0.2s;
-        }
-        .sys-on { background: rgba(0,206,201,0.08); border-color: var(--green); color: var(--green); }
-        .sys-off { background: rgba(232,67,147,0.08); border-color: var(--red); color: var(--red); }
-
-        /* History items */
-        .hist-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background: var(--surface);
-            border-radius: 14px;
-            margin-bottom: 8px;
-            border: 1.5px solid var(--border);
-            animation: slideIn 0.25s ease;
-        }
-        @keyframes slideIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
-        .hist-item .meta b { font-size: 13px; font-weight: 600; display: block; }
-        .hist-item .meta small { font-size: 11px; font-weight: 700; }
-        .hist-del { background: none; border: none; font-size: 14px; cursor: pointer; opacity: 0.4; transition: opacity 0.2s; padding: 4px; }
-        .hist-del:hover { opacity: 1; }
-
-        /* ===== CHALLENGE CARDS ===== */
-        .day-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 18px;
-            margin-bottom: 14px;
-            border: 1.5px solid var(--border);
-            box-shadow: var(--shadow);
-            transition: all 0.3s;
-            animation: cardIn 0.3s ease;
-        }
-        @keyframes cardIn { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
-        .day-card.locked { opacity: 0.85; }
-        .day-card.editing { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,107,53,0.1); }
-        .card-head {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-        }
-        .card-head h3 {
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            font-size: 15px;
-            font-weight: 800;
-            letter-spacing: -0.3px;
-        }
-        .badge {
-            font-size: 8px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border: 1px solid currentColor;
-        }
-        .badge-on { color: var(--blue); background: rgba(9,132,227,0.08); }
-        .badge-up { color: var(--green); background: rgba(0,206,201,0.1); }
-        .badge-dn { color: var(--red); background: rgba(232,67,147,0.1); }
-        .edit-btn {
-            background: var(--surface2);
-            border: 1.5px solid var(--border);
-            color: var(--muted);
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            letter-spacing: 0.3px;
-            transition: all 0.15s;
-        }
-        .edit-btn:active { transform: scale(0.93); }
-        .locked .field input { pointer-events: none; border-color: transparent; background: transparent; padding-left: 0; color: var(--text); }
-        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .profit-box {
-            grid-column: span 2;
-            background: rgba(0,206,201,0.06);
-            border: 1.5px solid rgba(0,206,201,0.2);
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-        }
-        .profit-box small { font-size: 8px; color: var(--muted); display: block; text-transform: uppercase; letter-spacing: 1px; }
-        .profit-box b { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; font-size: 18px; color: var(--green); }
-        .save-btn {
-            display: none;
-            width: 100%;
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: 14px;
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            margin-top: 14px;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 16px rgba(255,107,53,0.35);
-            transition: transform 0.15s;
-        }
-        .save-btn:active { transform: scale(0.97); }
-        .editing .save-btn { display: block; }
-
-        /* ===== WORDS ===== */
-        .words-card { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; border: 1.5px solid var(--border); box-shadow: var(--shadow); }
-        .words-card h3 { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 800; margin-bottom: 10px; }
-        .words-card textarea { width: 100%; height: 110px; background: var(--surface2); border: 1.5px solid var(--border); color: var(--text); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; border-radius: 12px; padding: 10px 12px; resize: none; font-size: 13px; line-height: 1.6; transition: border-color 0.2s; }
-        .words-card textarea:focus { border-color: var(--accent); }
-        .word-count { font-size: 10px; color: var(--muted); margin-top: 6px; font-weight: 600; }
-
-        /* ===== FLOATING BOTTOM BAR ===== */
-        .bottom-bar {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            padding: 10px 16px 20px;
-            background: var(--bg);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            z-index: 99;
-            backdrop-filter: blur(12px);
-        }
-        .bb-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 6px 14px;
-            border-radius: 12px;
-            transition: background 0.15s;
-            color: var(--muted);
-        }
-        .bb-btn.active { color: var(--accent); }
-        .bb-btn span { font-size: 18px; }
-        .bb-btn small { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        /* ===== SECTION HEADERS ===== */
-        .sec-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 14px;
-        }
-        .sec-header h2 {
-            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-        .sec-action {
-            background: var(--surface);
-            border: 1.5px solid var(--border);
-            color: var(--muted);
-            padding: 7px 14px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .sec-action:active { transform: scale(0.93); }
-
-        /* ===== CONFETTI ===== */
-        .confetti-piece {
-            position: fixed;
-            width: 10px; height: 10px;
-            border-radius: 2px;
-            animation: confettiFall 2.5s linear forwards;
-            z-index: 9999;
-            pointer-events: none;
-        }
-        @keyframes confettiFall {
-            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
-
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed;
-            bottom: 90px;
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
-            background: var(--text);
-            color: var(--bg);
-            padding: 10px 22px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            z-index: 9999;
-            opacity: 0;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* ===== MOTIVATION BANNER ===== */
-        .motive-banner {
-            background: linear-gradient(135deg, var(--accent), #ff8c42);
-            border-radius: var(--radius);
-            padding: 16px 20px;
-            margin-bottom: 14px;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .motive-banner .icon { font-size: 32px; }
-        .motive-banner h4 { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 800; margin-bottom: 3px; }
-        .motive-banner p { font-size: 11px; opacity: 0.85; line-height: 1.4; }
-
-        /* mini chart bars */
-        .mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 50px; margin-top: 12px; }
-        .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-        .chart-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.8s cubic-bezier(.4,0,.2,1); min-height: 2px; }
-        .chart-label { font-size: 8px; color: var(--muted); font-weight: 700; }
-
-        /* Empty state */
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); }
-        .empty-state .emoji { font-size: 48px; display: block; margin-bottom: 12px; }
-        .empty-state p { font-size: 13px; line-height: 1.5; }
-
-        /* Range chips for challenge */
-        .range-nav { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 14px; padding-bottom: 4px; scrollbar-width: none; }
-        .range-chip { flex-shrink: 0; padding: 7px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; transition: all 0.15s; }
-        .range-chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#0f0c29"/>
+<title>Rus Tili Lug'at Testi</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#0f0c29;font-family:'Segoe UI',Tahoma,sans-serif;overflow-x:hidden;min-height:100vh}
+input,button,textarea{font-family:inherit}
+button{cursor:pointer}
+button:active{opacity:0.82;transform:scale(0.97)}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.shake{animation:shake 0.5s ease}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:4px}
+#app{min-height:100vh;background:linear-gradient(145deg,#0f0c29 0%,#302b63 50%,#24243e 100%);display:flex;align-items:flex-start;justify-content:center;padding:20px 14px 70px;overflow-y:auto}
+.card{background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:28px;padding:34px 20px;max-width:440px;width:100%;text-align:center;margin-top:8px}
+.wrap{max-width:440px;width:100%;margin-top:8px}
+.btn-primary{background:linear-gradient(135deg,#f5c518,#e8a000);color:#1a1a2e;border:none;border-radius:16px;padding:15px 0;width:100%;font-size:16px;font-weight:800;box-shadow:0 8px 20px rgba(245,197,24,0.3);margin-bottom:10px;display:block}
+.btn-danger{background:linear-gradient(135deg,#f87171,#ef4444);color:#fff;border:none;border-radius:16px;padding:13px 0;width:100%;font-size:15px;font-weight:700;box-shadow:0 6px 15px rgba(248,113,113,0.2);margin-bottom:10px;display:block}
+.btn-ghost{background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.13);border-radius:16px;padding:12px 0;width:100%;font-size:14px;font-weight:600;display:block;margin-bottom:6px}
+.btn-back{background:transparent;border:none;color:rgba(255,255,255,0.45);font-size:14px;padding:4px 0}
+.opt-btn{background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.1);border-radius:13px;padding:14px;display:flex;align-items:center;gap:10px;width:100%;color:#fff;text-align:left;font-size:15px;font-weight:600;margin-bottom:8px}
+.opt-btn.correct{background:rgba(74,222,128,0.2);border-color:#4ade80}
+.opt-btn.wrong{background:rgba(248,113,113,0.2);border-color:#f87171}
+.opt-btn.dim{opacity:0.35}
+.opt-letter{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#f5c518;flex-shrink:0}
+.tab-row{display:flex;gap:4px;margin-bottom:13px;background:rgba(255,255,255,0.04);border-radius:14px;padding:4px}
+.tab{flex:1;background:transparent;border:none;color:rgba(255,255,255,0.45);padding:9px 2px;border-radius:10px;font-size:12px;font-weight:600}
+.tab.active{background:rgba(245,197,24,0.18);color:#f5c518}
+.word-row{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:9px 11px;display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:6px}
+.form-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:20px;padding:17px}
+.form-input{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:11px 13px;color:#fff;font-size:14px;outline:none;margin-bottom:13px;display:block}
+.form-textarea{width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:11px 13px;color:#fff;font-size:12px;outline:none;margin-bottom:13px;display:block;resize:vertical;font-family:monospace}
+.form-label{display:block;color:rgba(255,255,255,0.45);font-size:11px;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px}
+.msg-ok{background:rgba(74,222,128,0.13);border:1px solid rgba(74,222,128,0.28);border-radius:10px;padding:9px 11px;color:#4ade80;font-size:13px;margin-bottom:11px}
+.msg-err{background:rgba(248,113,113,0.13);border:1px solid rgba(248,113,113,0.28);border-radius:10px;padding:9px 11px;color:#f87171;font-size:13px;margin-bottom:11px}
+.word-list{max-height:56vh;overflow-y:auto}
+.speaker-icon{font-size:16px;cursor:pointer;background:rgba(255,255,255,0.1);border-radius:50%;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;margin-left:8px}
+</style>
 </head>
 <body>
+<div id="app"></div>
+<script>
+const DEFAULT_VOCAB=[
+  {id:1,rus:"Привет",uzbek:"Salom"},{id:2,rus:"Спасибо",uzbek:"Rahmat"},{id:3,rus:"Пожалуйста",uzbek:"Iltimos"},
+  {id:4,rus:"Да",uzbek:"Ha"},{id:5,rus:"Нет",uzbek:"Yo'q"},{id:6,rus:"Хорошо",uzbek:"Yaxshi"},
+  {id:7,rus:"Плохо",uzbek:"Yomon"},{id:8,rus:"Извините",uzbek:"Kechirasiz"},{id:9,rus:"Понятно",uzbek:"Tushunarli"},
+  {id:10,rus:"Конечно",uzbek:"Albatta"},{id:11,rus:"Вода",uzbek:"Suv"},{id:12,rus:"Хлеб",uzbek:"Non"},
+  {id:13,rus:"Молоко",uzbek:"Sut"},{id:14,rus:"Мясо",uzbek:"Go'sht"},{id:15,rus:"Рис",uzbek:"Guruch"},
+  {id:16,rus:"Яблоко",uzbek:"Olma"},{id:17,rus:"Чай",uzbek:"Choy"},{id:18,rus:"Кофе",uzbek:"Qahva"},
+  {id:19,rus:"Суп",uzbek:"Sho'rva"},{id:20,rus:"Сахар",uzbek:"Shakar"},{id:21,rus:"Дом",uzbek:"Uy"},
+  {id:22,rus:"Стол",uzbek:"Stol"},{id:23,rus:"Стул",uzbek:"Stul"},{id:24,rus:"Окно",uzbek:"Deraza"},
+  {id:25,rus:"Дверь",uzbek:"Eshik"},{id:26,rus:"Кровать",uzbek:"Karavot"},{id:27,rus:"Кухня",uzbek:"Oshxona"},
+  {id:28,rus:"Ванная",uzbek:"Hammom"},{id:29,rus:"Машина",uzbek:"Mashina"},{id:30,rus:"Автобус",uzbek:"Avtobus"},
+  {id:31,rus:"Поезд",uzbek:"Poyezd"},{id:32,rus:"Самолёт",uzbek:"Samolyot"},{id:33,rus:"Метро",uzbek:"Metro"},
+  {id:34,rus:"Такси",uzbek:"Taksi"},{id:35,rus:"Школа",uzbek:"Maktab"},{id:36,rus:"Университет",uzbek:"Universitet"},
+  {id:37,rus:"Книга",uzbek:"Kitob"},{id:38,rus:"Ручка",uzbek:"Qalam"},{id:39,rus:"Тетрадь",uzbek:"Daftar"},
+  {id:40,rus:"Учитель",uzbek:"O'qituvchi"},{id:41,rus:"Урок",uzbek:"Dars"},{id:42,rus:"Работа",uzbek:"Ish"},
+  {id:43,rus:"Деньги",uzbek:"Pul"},{id:44,rus:"Банк",uzbek:"Bank"},{id:45,rus:"Цена",uzbek:"Narx"},
+  {id:46,rus:"Время",uzbek:"Vaqt"},{id:47,rus:"Сегодня",uzbek:"Bugun"},{id:48,rus:"Завтра",uzbek:"Ertaga"},
+  {id:49,rus:"Вчера",uzbek:"Kecha"},{id:50,rus:"Уtro",uzbek:"Ertalab"},{id:51,rus:"Вечер",uzbek:"Kechqurun"},
+  {id:52,rus:"Ночь",uzbek:"Tun"},{id:53,rus:"Неделя",uzbek:"Hafta"},{id:54,rus:"Месяц",uzbek:"Oy"},
+  {id:55,rus:"Год",uzbek:"Yil"},{id:56,rus:"Друг",uzbek:"Do'st"},{id:57,rus:"Семья",uzbek:"Oila"},
+  {id:58,rus:"Мама",uzbek:"Ona"},{id:59,rus:"Папа",uzbek:"Ota"},{id:60,rus:"Брат",uzbek:"Aka/Uka"},
+  {id:61,rus:"Сестра",uzbek:"Opa/Singil"},{id:62,rus:"Муж",uzbek:"Er"},{id:63,rus:"Жена",uzbek:"Xotin"},
+  {id:64,rus:"Сын",uzbek:"O'g'il"},{id:65,rus:"Дочь",uzbek:"Qiz"},{id:66,rus:"Город",uzbek:"Shahar"},
+  {id:67,rus:"Страна",uzbek:"Mamlakat"},{id:68,rus:"Улица",uzbek:"Ko'cha"},{id:69,rus:"Магазин",uzbek:"Do'kon"},
+  {id:70,rus:"Больница",uzbek:"Kasalxona"},{id:71,rus:"Аптека",uzbek:"Dorixona"},{id:72,rus:"Рынок",uzbek:"Bozor"}
+];
 
-    <!-- HEADER -->
-    <div class="app-header">
-        <div class="app-title">CHALLENGE<span>.</span></div>
-        <div class="header-actions">
-            <button class="icon-btn" onclick="exportExcel()" title="Excel">📤</button>
-            <button class="icon-btn" onclick="fullRestart()" title="Reset" style="color:var(--red)">🔄</button>
-            <button class="icon-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
-        </div>
+// ── STATE ──
+let vocab=[], screen='home', pool=[], selected=null,
+    wrongWordsList=[], form={rus:'',uzbek:''}, formErr='', formOk='', 
+    editId=null, adminTab='list', searchQ='', delConfirm=null, 
+    csvText='', csvRes='', stats={total:0, correct:0};
+
+function loadVocab(){
+  try{const s=localStorage.getItem('rlv5_smart');if(s)return JSON.parse(s);}catch(e){}
+  return DEFAULT_VOCAB.map(w=>({...w}));
+}
+function saveVocab(){try{localStorage.setItem('rlv5_smart',JSON.stringify(vocab));}catch(e){}}
+function shuffle(a){return[...a].sort(()=>Math.random()-0.5);}
+function getOptions(correct){
+  return shuffle([correct,...shuffle(vocab.filter(w=>w.id!==correct.id)).slice(0,3)]);
+}
+function speakText(text) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const speak = new SpeechSynthesisUtterance(text);
+    speak.lang = 'ru-RU';
+    window.speechSynthesis.speak(speak);
+  }
+}
+
+// ── RENDER ──
+function render(){
+  const app=document.getElementById('app');
+  app.innerHTML='';
+  if(screen==='home') renderHome(app);
+  else if(screen==='quiz') renderQuiz(app);
+  else if(screen==='result') renderResult(app);
+  else if(screen==='admin') renderAdmin(app);
+}
+
+// ── HOME ──
+function renderHome(root){
+  root.innerHTML=`
+  <div class="card">
+    <div style="font-size:42px;margin-bottom:12px">🇷🇺 ➔ 🇺🇿</div>
+    <h1 style="font-size:32px;font-weight:800;color:#fff;margin:0 0 6px;letter-spacing:-1px">Rus Tili<br><span style="color:#f5c518">Lug'at Testi</span></h1>
+    <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-bottom:24px">Ovozli va aqlli cheksiz takrorlash tizimi</p>
+    
+    <div style="background:rgba(255,255,255,0.06);border-radius:18px;padding:14px;margin-bottom:24px;display:flex;justify-content:center;gap:30px">
+      <div>
+        <div style="font-size:24px;font-weight:800;color:#f5c518">${vocab.length}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-top:2px">Jami So'z</div>
+      </div>
+      <div style="border-left:1px solid rgba(255,255,255,0.1)"></div>
+      <div>
+        <div style="font-size:24px;font-weight:800;color:#4ade80">3-4 Savol</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-top:2px">Spaced Loop</div>
+      </div>
     </div>
 
-    <!-- DASHBOARD -->
-    <div class="dashboard" id="dashboard">
-        <div class="dash-top">
-            <div>
-                <div class="dash-label" id="main-display-label">UMUMIY BALANS</div>
-                <div class="dash-amount" id="main-display-amount">0 UZS</div>
-                <div class="dash-amount-label">so'm</div>
-            </div>
-            <div class="target-pill" onclick="editChallengeSettings()">
-                <small>MAQSAD</small>
-                <b id="target-label">100</b>
-                <small style="font-size:8px; opacity:0.5">kun ⚙️</small>
-            </div>
-        </div>
-        <div class="prog-wrap" id="prog-wrap" style="display:none">
-            <div class="prog-bar-bg"><div class="prog-bar-fill" id="prog-bar" style="width:0%"></div></div>
-            <div class="prog-info">
-                <span id="prog-text-left">0 / 0</span>
-                <span id="prog-text-right">0%</span>
-            </div>
-        </div>
-        <div id="overall-status"></div>
-        <div class="stats-row" id="stats-row">
-            <div class="stat-mini green"><b id="s-inc">0</b><small>Tushum</small></div>
-            <div class="stat-mini red"><b id="s-exp">0</b><small>Xarajat</small></div>
-            <div class="stat-mini yellow"><b id="s-work-profit">0</b><small>Foyda</small></div>
-            <div class="stat-mini"><b id="s-ord">0</b><small>Order</small></div>
-            <div class="stat-mini"><b id="s-word">0</b><small>Lug'at</small></div>
-            <div class="stat-mini"><b id="s-hrs">0</b><small>Soat</small></div>
-            <div class="stat-mini"><b id="s-avg-ord">0</b><small>Avg/Ord</small></div>
-            <div class="stat-mini"><b id="s-avg-hr">0</b><small>Avg/Soat</small></div>
-            <div class="stat-mini"><b id="s-plan">0</b><small>Kutilgan</small></div>
-        </div>
+    <button class="btn-primary" id="startBtn">Testni Boshlash ▶</button>
+    <button class="btn-ghost" id="adminBtn">⚙️ So'zlarni Boshqarish / Backup</button>
+  </div>`;
+
+  document.getElementById('startBtn').onclick=startQuiz;
+  document.getElementById('adminBtn').onclick=()=>{adminTab='list';screen='admin';render();};
+}
+
+// ── QUIZ ──
+function startQuiz(){
+  if(vocab.length<4){alert("Testni boshlash uchun bazada kamida 4 ta so'z bo'lishi kerak!");return;}
+  pool=shuffle(vocab);
+  stats={total:0, correct:0};
+  wrongWordsList=[];
+  selected=null;
+  screen='quiz';
+  render();
+}
+
+function renderQuiz(root){
+  if(pool.length===0){pool=shuffle(vocab);} 
+  const currentWord=pool[0]; 
+  const options=getOptions(currentWord);
+
+  const div=document.createElement('div');
+  div.className='wrap';
+  div.innerHTML=`
+    <div style="display:flex;justify-content:between;align-items:center;margin-bottom:14px;gap:10px">
+      <div style="color:rgba(255,255,255,0.65);font-size:14px;font-weight:600;flex:1;text-align:left">Savollar soni: ${stats.total}</div>
+      <span style="background:rgba(74,222,128,0.15);color:#4ade80;border-radius:20px;padding:4px 12px;font-size:13px;font-weight:700">✅ To'g'ri: ${stats.correct}</span>
     </div>
-
-    <!-- NAV -->
-    <div class="nav-wrap">
-        <div class="nav-scroll" id="main-nav">
-            <div class="nav-chip active" onclick="showMain(this)">💰 ASOSIY</div>
-            <div class="nav-chip" onclick="showChallenge(this)">⚡ CHALLENGE</div>
-            <div class="nav-chip" onclick="showWords(this)">📖 LUG'AT</div>
-        </div>
+    
+    <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:30px 20px;text-align:center;margin-bottom:16px;cursor:pointer" id="soundTrigger">
+      <h2 style="font-size:42px;font-weight:800;color:#fff;margin:0 0 8px;letter-spacing:-0.5px">
+        ${currentWord.rus} <span class="speaker-icon">🔊</span>
+      </h2>
+      <p style="color:rgba(255,255,255,0.4);font-size:13px;margin:0">O'zbekcha tarjimasi nima?</p>
     </div>
+    <div id="opts"></div>
+    <button class="btn-danger" id="stopBtn" style="margin-top:12px">Testni Yakunlash ⏹</button>
+  `;
 
-    <!-- CONTENT -->
-    <div class="content">
+  root.appendChild(div);
+  speakText(currentWord.rus);
 
-        <!-- MAIN SECTION -->
-        <div class="section active" id="sec-main">
-            <button id="toggle-sys-btn" class="sys-btn" onclick="toggleLugatSystem()"></button>
+  document.getElementById('soundTrigger').onclick=()=>speakText(currentWord.rus);
+  document.getElementById('stopBtn').onclick=()=>{screen='result';render();};
 
-            <!-- Motivation -->
-            <div class="motive-banner" id="motive-banner">
-                <div class="icon">🔥</div>
-                <div>
-                    <h4>Buguni kuchli o'ting!</h4>
-                    <p>Har bir order — maqsadga bir qadam yaqinroq.</p>
-                </div>
-            </div>
+  const optsDiv=document.getElementById('opts');
+  options.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='opt-btn';
+    b.innerHTML=`<span class="opt-letter">${['A','B','C','D'][i]}</span><span style="flex:1">${opt.uzbek}</span>`;
+    b.onclick=()=>pickAnswer(opt,currentWord);
+    optsDiv.appendChild(b);
+  });
+}
 
-            <div class="wallet-card">
-                <h3>💳 Hamyon</h3>
-                <div class="field"><label>Summa</label><input type="number" id="w-amt" placeholder="0 UZS" inputmode="numeric"></div>
-                <div class="field"><label>Izoh</label><input type="text" id="w-msg" placeholder="Sabab..."></div>
-                <div class="btn-row">
-                    <button class="btn-inc" onclick="addW('inc')">+ KIRIM</button>
-                    <button class="btn-exp" onclick="addW('exp')">− CHIQIM</button>
-                </div>
-            </div>
+function pickAnswer(opt,correctWord){
+  if(selected)return;
+  selected=opt;
+  stats.total++;
+  const isOk=opt.id===correctWord.id;
+  
+  if(isOk) {
+    stats.correct++;
+  } else {
+    // TXT yuklab olish ro'yxatiga dublikatsiz qo'shish
+    if(!wrongWordsList.some(w=>w.id===correctWord.id)){
+      wrongWordsList.push(correctWord);
+    }
+    
+    // Aqlli takrorlash: Xato qilingan so'zni aniq 3-4 tadan keyingi o'ringa tiqish
+    // Agar pool uzunligi kichik bo'lsa, avtomat ro'yxat oxiriga tushadi
+    let insertIndex = Math.min(4, pool.length);
+    pool.splice(insertIndex, 0, correctWord);
+  }
 
-            <div id="wallet-history-wrap">
-                <div class="sec-header" style="margin-top:6px">
-                    <h2 style="font-size:15px">So'nggi harakatlar</h2>
-                </div>
-                <div id="wallet-history"></div>
-            </div>
-        </div>
+  document.querySelectorAll('.opt-btn').forEach(b=>{
+    const txt=b.querySelector('span:last-child').textContent;
+    const isThis=txt===opt.uzbek;
+    const isCorr=txt===correctWord.uzbek;
+    if(isCorr){b.classList.add('correct');b.innerHTML+=`<span style="color:#4ade80;font-weight:700;margin-left:auto">✓</span>`;}
+    else if(isThis&&!isOk){b.classList.add('wrong');b.innerHTML+=`<span style="color:#f87171;font-weight:700;margin-left:auto">✗</span>`;}
+    else b.classList.add('dim');
+  });
 
-        <!-- CHALLENGE SECTION -->
-        <div class="section" id="sec-challenge">
-            <div class="range-nav" id="range-nav"></div>
-            <div id="card-container"></div>
-        </div>
+  if(!isOk){
+    const shakeBtn=document.querySelector('.opt-btn.wrong');
+    if(shakeBtn){shakeBtn.classList.add('shake');setTimeout(()=>shakeBtn.classList.remove('shake'),600);}
+  }
 
-        <!-- WORDS SECTION -->
-        <div class="section" id="sec-words">
-            <div class="sec-header">
-                <h2>📖 So'zlar</h2>
-                <button class="sec-action" onclick="downloadTXT()">💾 TXT</button>
-            </div>
-            <div id="words-container"></div>
-        </div>
+  setTimeout(()=>{
+    selected=null;
+    pool.shift(); // Joriy so'ralgan so'zni olib tashlaydi
+    render();
+  },isOk?600:1200);
+}
 
+// ── RESULT ──
+function renderResult(root){
+  const pct=stats.total > 0 ? Math.round((stats.correct/stats.total)*100) : 0;
+  let downloadBtnHtml='';
+  
+  if(wrongWordsList.length > 0){
+    downloadBtnHtml=`
+      <button class="btn-primary" id="dlWrongBtn" style="background:linear-gradient(135deg,#f87171,#ef4444);color:#fff;box-shadow:0 8px 20px rgba(248,113,113,0.3);margin-top:15px;margin-bottom:15px">
+        ❌ Xatolarni Yuklab Olish (.txt) 📥
+      </button>
+    `;
+  } else {
+    downloadBtnHtml=`<p style="color:#4ade80;font-size:14px;font-weight:700;margin:15px 0">Ajoyib! Biror marta ham xato qilmadingiz! 🎉</p>`;
+  }
+
+  root.innerHTML=`
+  <div class="card">
+    <div style="font-size:52px;margin-bottom:7px">🏁</div>
+    <h2 style="color:#fff;font-size:22px;font-weight:700;margin:0 0 14px">Test yakunlandi</h2>
+    <div style="display:flex;align-items:baseline;justify-content:center;gap:4px;margin-bottom:3px">
+      <span style="font-size:54px;font-weight:900;color:#f5c518;line-height:1">${stats.correct}</span>
+      <span style="font-size:20px;color:rgba(255,255,255,0.45);font-weight:600">/ ${stats.total}</span>
     </div>
+    <div style="color:rgba(255,255,255,0.45);font-size:14px;margin-bottom:10px">To'g'ri javob ko'rsatkichi: ${pct}%</div>
+    
+    ${downloadBtnHtml}
 
-    <!-- TOAST -->
-    <div class="toast" id="toast"></div>
+    <button class="btn-primary" id="retryBtn">Qayta Boshlash 🔄</button>
+    <button class="btn-ghost" id="homeBtn">Bosh Sahifa</button>
+  </div>`;
 
-    <script>
-        // ===== THEME =====
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.getElementById('theme-btn').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+  document.getElementById('retryBtn').onclick=startQuiz;
+  document.getElementById('homeBtn').onclick=()=>{screen='home';render();};
+  
+  if(wrongWordsList.length > 0){
+    document.getElementById('dlWrongBtn').onclick=()=>{
+      let textContent = wrongWordsList.map(w => `${w.rus},${w.uzbek}`).join('\n');
+      let blob = new Blob([textContent], {type: "text/plain;charset=utf-8"});
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `test_xatolari_backup.txt`;
+      link.click();
+    };
+  }
+}
 
-        function toggleTheme() {
-            const cur = document.documentElement.getAttribute('data-theme');
-            const next = cur === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
-            document.getElementById('theme-btn').textContent = next === 'dark' ? '☀️' : '🌙';
+// ── ADMIN ──
+function renderAdmin(root){
+  const filtered=vocab.filter(w=>
+    (!searchQ||w.rus.toLowerCase().includes(searchQ.toLowerCase())||w.uzbek.toLowerCase().includes(searchQ.toLowerCase()))
+  );
+
+  const wrap=document.createElement('div');
+  wrap.className='wrap';
+  wrap.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px">
+      <button class="btn-back" id="aBack">← Orqaga</button>
+      <h2 style="color:#fff;font-size:17px;font-weight:700;margin:0">⚙️ Boshqarish Panel</h2>
+      <span style="background:rgba(245,197,24,0.18);color:#f5c518;border-radius:12px;padding:3px 10px;font-size:13px;font-weight:700">${vocab.length} ta</span>
+    </div>
+    <div class="tab-row">
+      <button class="tab ${adminTab==='list'?'active':''}" id="tList">📋 Ro'yxat</button>
+      <button class="tab ${adminTab==='add'?'active':''}" id="tAdd">${editId?'✏️ Tahrirlash':'➕ Qo\'shish'}</button>
+      <button class="tab ${adminTab==='csv'?'active':''}" id="tCSV">📥 Import / Eksport</button>
+    </div>
+    <div id="tabContent"></div>`;
+
+  root.appendChild(wrap);
+
+  document.getElementById('aBack').onclick=()=>{screen='home';render();};
+  document.getElementById('tList').onclick=()=>{adminTab='list';editId=null;form={rus:'',uzbek:''};render();};
+  document.getElementById('tAdd').onclick=()=>{adminTab='add';render();};
+  document.getElementById('tCSV').onclick=()=>{adminTab='csv';render();};
+
+  const tc=document.getElementById('tabContent');
+
+  if(adminTab==='list'){
+    tc.innerHTML=`
+      <input class="form-input" style="margin-bottom:8px" placeholder="🔍 Qidirish..." id="srch" value="${searchQ}"/>
+      <div class="word-list" id="wlist"></div>`;
+
+    document.getElementById('srch').oninput=e=>{searchQ=e.target.value;render();};
+
+    const wl=document.getElementById('wlist');
+    filtered.forEach(word=>{
+      const row=document.createElement('div');
+      row.className='word-row';
+      row.innerHTML=`
+        <div style="display:flex;align-items:center;gap:6px;flex:1;text-align:left;cursor:pointer" onclick="speakText('${word.rus}')">
+          <span style="color:#fff;font-weight:700;font-size:15px">${word.rus} 🔊</span>
+          <span style="color:rgba(255,255,255,0.25);font-size:12px">➔</span>
+          <span style="color:#f5c518;font-size:14px">${word.uzbek}</span>
+        </div>
+        <div style="display:flex;gap:5px;flex-shrink:0">
+          <button style="background:rgba(255,255,255,0.07);border:none;border-radius:8px;width:30px;height:30px;font-size:13px" data-edit="${word.id}">✏️</button>
+          <button style="background:${delConfirm===word.id?'rgba(248,113,113,0.4)':'rgba(248,113,113,0.09)'};border:none;border-radius:8px;width:30px;height:30px;font-size:13px;color:${delConfirm===word.id?'#fff':'inherit'}" data-del="${word.id}">${delConfirm===word.id?'?':'🗑'}</button>
+        </div>`;
+      
+      row.querySelector('[data-edit]').onclick=()=>{
+        form={rus:word.rus,uzbek:word.uzbek};
+        editId=word.id;adminTab='add';formErr='';formOk='';render();
+      };
+      row.querySelector('[data-del]').onclick=()=>{
+        if(delConfirm===word.id){
+          vocab=vocab.filter(w=>w.id!==word.id);
+          saveVocab();
+          delConfirm=null;
+          render();
+        }else{
+          delConfirm=word.id;
+          render();
+          setTimeout(()=>{if(delConfirm===word.id){delConfirm=null;render();}},3000);
         }
+      };
+      wl.appendChild(row);
+    });
+  }
 
-        // ===== DB =====
-        let db = JSON.parse(localStorage.getItem('chal_elite_v1')) || {
-            cards: {}, wallet: [], lugatEnabled: true, target: 100, orderTarget: 2000
-        };
-        let currentSection = 'main';
-        let currentRange = { s: 1, e: 20 };
+  if(adminTab==='add'){
+    tc.innerHTML=`
+    <div class="form-card" style="text-align:left">
+      <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 13px">${editId?'✏️ Tahrirlash':'➕ Yangi so\'z'}</h3>
+      ${formErr?`<div class="msg-err">${formErr}</div>`:''}
+      ${formOk?`<div class="msg-ok">${formOk}</div>`:''}
+      <label class="form-label">Ruscha so'z *</label>
+      <input class="form-input" id="fRus" placeholder="Masalan: Привет" value="${form.rus}"/>
+      <label class="form-label">O'zbekcha tarjimasi *</label>
+      <input class="form-input" id="fUz" placeholder="Masalan: Salom" value="${form.uzbek}"/>
+      <button class="btn-primary" id="saveBtn">${editId?' Saqlash':' Qo\'shish'}</button>
+      ${editId?`<button class="btn-ghost" id="cancelBtn">Bekor qilish</button>`:''}
+    </div>`;
 
-        // ===== INIT =====
-        function init() {
-            updateSystemUI();
-            updateMotivation();
-            update();
-            renderHistory();
-            buildRangeNav();
+    document.getElementById('fRus').oninput=e=>{form.rus=e.target.value;};
+    document.getElementById('fUz').oninput=e=>{form.uzbek=e.target.value;};
+
+    document.getElementById('saveBtn').onclick=()=>{
+      formErr='';formOk='';
+      const rus=form.rus.trim();
+      const uzbek=form.uzbek.trim();
+      
+      if(!rus||!uzbek){formErr="Ikkala maydonni ham to'ldiring!";render();return;}
+      
+      if(editId!==null){
+        vocab=vocab.map(w=>w.id===editId?{...w,rus,uzbek}:w);
+        saveVocab();formOk='✅ So\'z yangilandi!';editId=null;
+      } else {
+        vocab.push({id:Date.now(),rus,uzbek});
+        saveVocab();formOk='✅ Yangi so\'z qo\'shildi!';
+      }
+      form={rus:'',uzbek:''};
+      render();
+    };
+    if(editId){
+      document.getElementById('cancelBtn').onclick=()=>{editId=null;form={rus:'',uzbek:''};render();};
+    }
+  }
+
+  if(adminTab==='csv'){
+    tc.innerHTML=`
+    <div class="form-card" style="text-align:left;margin-bottom:15px">
+      <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 11px">📥 CSV Formatda Import</h3>
+      <p style="color:rgba(255,255,255,0.45);font-size:12px;margin-bottom:7px">Format: <code style="background:rgba(255,255,255,0.09);padding:1px 5px;border-radius:4px;font-size:11px">ruscha,uzbekcha</code></p>
+      ${csvRes?`<div class="msg-ok">${csvRes}</div>`:''}
+      <textarea class="form-textarea" rows="4" id="csvTa" placeholder="Кошка,Mushuk&#10;Собака,It">${csvText}</textarea>
+      <button class="btn-primary" id="csvBtn">Import qilish ⚡</button>
+    </div>
+    
+    <div class="form-card" style="text-align:left">
+      <h3 style="color:#fff;font-size:15px;font-weight:700;margin:0 0 6px">📤 Jami Baza Rezerv Nusxasi (Backup)</h3>
+      <p style="color:rgba(255,255,255,0.45);font-size:12px;margin-bottom:12px">Lug'atdagi barcha so'zlarni telefonga matn (.txt) fayl shaklida saqlab oling.</p>
+      <button class="btn-ghost" id="expBtn" style="color:#f5c518;border-color:rgba(245,197,24,0.3)">Faylga Yuklab Olish 💾</button>
+    </div>`;
+
+    document.getElementById('csvTa').oninput=e=>{csvText=e.target.value;};
+
+    document.getElementById('csvBtn').onclick=()=>{
+      if(!csvText.trim()){alert("Matn maydoni bo'sh!"); return;}
+      const lines = csvText.split('\n');
+      let count = 0;
+      lines.forEach((line, index)=>{
+        if(!line.trim()) return;
+        const parts = line.split(',');
+        if(parts.length >= 2){
+          const rus = parts[0].trim();
+          const uzbek = parts[1].trim();
+          if(rus && uzbek){
+            vocab.push({id:Date.now() + index, rus, uzbek});
+            count++;
+          }
         }
+      });
+      if(count > 0){
+        saveVocab();
+        csvRes = `✅ ${count} ta so'z muvaffaqiyatli qo'shildi!`;
+        csvText = '';
+      } else {
+        csvRes = `❌ Format noto'g'ri.`;
+      }
+      render();
+    };
 
-        function buildRangeNav() {
-            const nav = document.getElementById('range-nav');
-            nav.innerHTML = '';
-            for (let i = 1; i <= db.target; i += 20) {
-                let end = Math.min(i + 19, db.target);
-                const chip = document.createElement('div');
-                chip.className = 'range-chip' + (i === 1 ? ' active' : '');
-                chip.textContent = `${i}–${end}`;
-                const _i = i, _e = end;
-                chip.onclick = () => {
-                    document.querySelectorAll('.range-chip').forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    currentRange = { s: _i, e: _e };
-                    renderCards(_i, _e);
-                    update();
-                };
-                nav.appendChild(chip);
-            }
-        }
+    document.getElementById('expBtn').onclick=()=>{
+      if(vocab.length===0){alert("Eksport qilish uchun so'z yo'q!");return;}
+      let textContent = vocab.map(w => `${w.rus},${w.uzbek}`).join('\n');
+      let blob = new Blob([textContent], {type: "text/plain;charset=utf-8"});
+      let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `rus_tili_lugat_backup.txt`;
+      link.click();
+    };
+  }
+}
 
-        // ===== NAV =====
-        function showMain(el) {
-            switchSection('main', el);
-            document.getElementById('main-display-label').textContent = 'UMUMIY BALANS';
-            document.getElementById('stats-row').style.display = 'none';
-            document.getElementById('prog-wrap').style.display = 'none';
-            document.getElementById('overall-status').innerHTML = '';
-        }
-        function showChallenge(el) {
-            switchSection('challenge', el);
-            document.getElementById('main-display-label').textContent = 'ISHDAGI SOF FOYDA';
-            document.getElementById('stats-row').style.display = 'grid';
-            document.getElementById('prog-wrap').style.display = 'block';
-            renderCards(currentRange.s, currentRange.e);
-            update();
-        }
-        function showWords(el) {
-            switchSection('words', el);
-            document.getElementById('stats-row').style.display = 'none';
-            document.getElementById('prog-wrap').style.display = 'none';
-            document.getElementById('overall-status').innerHTML = '';
-            renderWords();
-        }
-        function switchSection(name, el) {
-            currentSection = name;
-            document.querySelectorAll('.nav-chip').forEach(c => c.classList.remove('active'));
-            el.classList.add('active');
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById('sec-' + name).classList.add('active');
-        }
-
-        // ===== UPDATE =====
-        function update() {
-            let workInc = 0, workExp = 0, ord = 0, word = 0, hrs = 0, tPlan = 0, activeDays = 0;
-            Object.values(db.cards).forEach(v => {
-                workInc += Number(v.i || 0); workExp += Number(v.x || 0);
-                ord += Number(v.o || 0); word += Number(v.w || 0);
-                tPlan += Number(v.p || 0);
-                if (v.lock && v.o !== undefined && v.o !== '') activeDays++;
-                if (v.s && v.e) {
-                    let [sh, sm] = v.s.split(':').map(Number);
-                    let [eh, em] = v.e.split(':').map(Number);
-                    if (!isNaN(sh) && !isNaN(eh)) { let d = (eh + em / 60) - (sh + sm / 60); if (d > 0) hrs += d; }
-                }
-            });
-
-            let goal = db.orderTarget || 1;
-            let percent = (ord / goal) * 100;
-            document.getElementById('prog-bar').style.width = Math.min(percent, 100) + '%';
-            document.getElementById('prog-text-left').textContent = `${ord} / ${goal}`;
-            document.getElementById('prog-text-right').textContent = `${percent.toFixed(1)}%`;
-
-            // Overall status
-            const ovStat = document.getElementById('overall-status');
-            let dailyNorm = db.orderTarget / db.target;
-            let expectedNow = dailyNorm * activeDays;
-            if (activeDays > 0) {
-                let diff = ord - expectedNow;
-                if (diff > 0) ovStat.innerHTML = `<span class="status-pill status-ahead">🚀 REJADAN OLDINDASIZ (+${diff.toFixed(0)})</span>`;
-                else if (diff < 0) ovStat.innerHTML = `<span class="status-pill status-behind">⚠️ REJADAN ORTDASIZ (${diff.toFixed(0)})</span>`;
-                else ovStat.innerHTML = `<span class="status-pill status-ok">✅ REJA BO'YICHA KETYAPSIZ</span>`;
-            } else {
-                ovStat.innerHTML = '';
-            }
-
-            // Amount display
-            let walletNet = db.wallet.reduce((a, b) => b.t === 'inc' ? a + b.a : a - b.a, 0);
-            let profit = workInc - workExp;
-            let displayVal = currentSection === 'main' ? (walletNet + profit) : profit;
-            document.getElementById('main-display-amount').textContent = fmt(displayVal) + ' UZS';
-            document.getElementById('target-label').textContent = db.target;
-
-            document.getElementById('s-work-profit').textContent = fmt(profit);
-            document.getElementById('s-ord').textContent = ord;
-            document.getElementById('s-word').textContent = word;
-            document.getElementById('s-plan').textContent = fmt(tPlan);
-            document.getElementById('s-inc').textContent = fmt(workInc);
-            document.getElementById('s-exp').textContent = fmt(workExp);
-            document.getElementById('s-avg-ord').textContent = fmt(ord > 0 ? Math.round(workInc / ord) : 0);
-            document.getElementById('s-avg-hr').textContent = fmt(hrs > 0 ? Math.round(workInc / hrs) : 0);
-            document.getElementById('s-hrs').textContent = hrs.toFixed(1);
-
-            // Confetti if 100%
-            if (percent >= 100 && !db._confettiDone) {
-                db._confettiDone = true;
-                launchConfetti();
-            }
-        }
-
-        function fmt(n) { return Number(n).toLocaleString('uz-UZ'); }
-
-        // ===== CARDS =====
-        function renderCards(s, e) {
-            const container = document.getElementById('card-container');
-            container.innerHTML = '';
-            const dailyNorm = db.orderTarget / db.target;
-            for (let i = s; i <= e; i++) {
-                let d = db.cards[i] || {};
-                let badgeCls = 'badge-on', badgeTxt = 'REJADA';
-                if (d.o > dailyNorm) { badgeCls = 'badge-up'; badgeTxt = '▲ REJADAN KO\'P'; }
-                else if (d.o < dailyNorm && d.o > 0) { badgeCls = 'badge-dn'; badgeTxt = '▼ ORTDA'; }
-
-                let profit = Number(d.i || 0) - Number(d.x || 0);
-                const card = document.createElement('div');
-                card.className = `day-card ${d.lock ? 'locked' : ''}`;
-                card.id = `c-${i}`;
-                card.innerHTML = `
-                    <div class="card-head">
-                        <h3>${d.day_name || i }</h3>
-                        <span class="badge ${badgeCls}">${badgeTxt}</span>
-                        <button class="edit-btn" onclick="unlock(${i})">✏️ TAHRIR</button>
-                    </div>
-                    <div class="card-grid">
-                        <div class="field"><label>⏰ Start</label><input type="text" class="t-s" value="${d.s || '08:00'}"></div>
-                        <div class="field"><label>🏁 Finish</label><input type="text" class="t-e" value="${d.e || '22:00'}"></div>
-                        <div class="field"><label>📦 Order</label><input type="number" class="v-o" value="${d.o || ''}" inputmode="numeric" oninput="autoPlan(${i}, this.value)"></div>
-                        <div class="field"><label>✅ Lug'at</label><input type="number" class="v-w" value="${d.w || 0}" inputmode="numeric" ${db.lugatEnabled ? 'readonly' : ''}></div>
-                        <div class="field"><label style="color:var(--accent)">🎯 Kutilgan</label><input type="number" class="v-p" value="${d.p || ''}" inputmode="numeric"></div>
-                        <div class="field"><label>💰 Tushum</label><input type="number" class="v-i" value="${d.i || ''}" inputmode="numeric"></div>
-                        <div class="field"><label>💸 Xarajat</label><input type="number" class="v-x" value="${d.x || ''}" inputmode="numeric"></div>
-                        <div class="profit-box"><small>Kunlik foyda</small><b style="color:${profit >= 0 ? 'var(--green)' : 'var(--red)'}">${fmt(profit)}</b></div>
-                    </div>
-                    <button class="save-btn" onclick="saveChallenge(${i})">💾 SAQLASH VA QULFLASH</button>`;
-                container.appendChild(card);
-            }
-        }
-
-        function autoPlan(i, v) {
-            const el = document.getElementById('c-' + i);
-            if (el) { const p = el.querySelector('.v-p'); if (p) p.value = v * 15000; }
-        }
-
-        function unlock(i) {
-            const el = document.getElementById('c-' + i);
-            el.classList.remove('locked');
-            el.classList.add('editing');
-        }
-
-        function saveChallenge(i) {
-            const el = document.getElementById('c-' + i);
-            db.cards[i] = {
-                ...db.cards[i],
-                s: el.querySelector('.t-s').value,
-                e: el.querySelector('.t-e').value,
-                o: el.querySelector('.v-o').value,
-                w: el.querySelector('.v-w').value,
-                p: el.querySelector('.v-p').value,
-                i: el.querySelector('.v-i').value,
-                x: el.querySelector('.v-x').value,
-                lock: true
-            };
-            sync();
-            renderCards(currentRange.s, currentRange.e);
-            showToast('✅ Saqlandi!');
-        }
-
-        // ===== WORDS =====
-        function renderWords() {
-            const container = document.getElementById('words-container');
-            container.innerHTML = '';
-            for (let i = 1; i <= db.target; i++) {
-                let d = db.cards[i] || {};
-                const card = document.createElement('div');
-                card.className = 'words-card';
-                card.innerHTML = `
-                    <h3>${d.day_name || i + '-kun'}</h3>
-                    <textarea placeholder="So'zlarni kiriting..." oninput="saveWords(${i}, this.value)">${d.slovar || ''}</textarea>
-                    <div class="word-count">${(d.slovar || '').split('\n').filter(l => l.trim()).length} ta so'z</div>`;
-                container.appendChild(card);
-            }
-        }
-
-        function saveWords(i, v) {
-            if (!db.cards[i]) db.cards[i] = {};
-            db.cards[i].slovar = v;
-            db.cards[i].w = v.split('\n').filter(l => l.trim()).length;
-            const wc = document.querySelectorAll('.word-count')[i - 1];
-            if (wc) wc.textContent = db.cards[i].w + ' ta so\'z';
-            sync();
-        }
-
-        // ===== WALLET =====
-        function addW(t) {
-            let a = parseInt(document.getElementById('w-amt').value);
-            if (!a) return;
-            db.wallet.push({ id: Date.now(), a, t, m: document.getElementById('w-msg').value || 'Izohsiz' });
-            document.getElementById('w-amt').value = '';
-            document.getElementById('w-msg').value = '';
-            sync();
-            renderHistory();
-            showToast(t === 'inc' ? '💚 Kirim qo\'shildi!' : '❤️ Chiqim qo\'shildi!');
-        }
-
-        function renderHistory() {
-            const div = document.getElementById('wallet-history');
-            div.innerHTML = '';
-            const items = [...db.wallet].reverse().slice(0, 8);
-            if (items.length === 0) {
-                div.innerHTML = `<div class="empty-state"><span class="emoji">💸</span><p>Hali harakatlar yo'q.<br>Kirim yoki chiqim qo'shing.</p></div>`;
-                return;
-            }
-            items.forEach(h => {
-                div.innerHTML += `
-                    <div class="hist-item">
-                        <div class="meta">
-                            <b>${h.m}</b>
-                            <small style="color:${h.t === 'inc' ? 'var(--green)' : 'var(--red)'}">${h.t === 'inc' ? '+' : '−'}${fmt(h.a)} UZS</small>
-                        </div>
-                        <button class="hist-del" onclick="delW(${h.id})">🗑️</button>
-                    </div>`;
-            });
-        }
-
-        function delW(id) {
-            db.wallet = db.wallet.filter(w => w.id !== id);
-            sync(); renderHistory();
-        }
-
-        // ===== SYSTEM =====
-        function toggleLugatSystem() { db.lugatEnabled = !db.lugatEnabled; updateSystemUI(); sync(); }
-        function updateSystemUI() {
-            const btn = document.getElementById('toggle-sys-btn');
-            if (btn) {
-                btn.className = db.lugatEnabled ? 'sys-btn sys-on' : 'sys-btn sys-off';
-                btn.textContent = db.lugatEnabled ? "💠 LUG'AT TIZIMI: FAOL" : "🚫 LUG'AT TIZIMI: O'CHIQ";
-            }
-        }
-
-        function updateMotivation() {
-            const msgs = [
-                { icon: '🔥', title: 'Buguni kuchli o\'ting!', body: 'Har bir order — maqsadga bir qadam yaqinroq.' },
-                { icon: '⚡', title: 'Energiya to\'la ish!', body: 'Bugun challenge rekordini yangilash vaqti.' },
-                { icon: '🏆', title: 'Champion fikrlaydi!', body: 'Qiyin kunlar kuchli odamlar yaratadi.' },
-                { icon: '💪', title: 'Hech qachon to\'xtama!', body: 'Har bir so\'z, har bir order — sen uchun.' },
-                { icon: '🚀', title: 'Yuqoriga uchramiz!', body: 'Maqsad aniq — yo\'l ham aniq.' },
-            ];
-            const m = msgs[new Date().getDay() % msgs.length];
-            const b = document.getElementById('motive-banner');
-            if (b) b.innerHTML = `<div class="icon">${m.icon}</div><div><h4>${m.title}</h4><p>${m.body}</p></div>`;
-        }
-
-        function editChallengeSettings() {
-            let days = prompt("Challenge necha kun?", db.target);
-            let ords = prompt("Jami order maqsadi:", db.orderTarget);
-            if (days) db.target = parseInt(days);
-            if (ords) db.orderTarget = parseInt(ords);
-            sync();
-            buildRangeNav();
-            update();
-        }
-
-        function fullRestart() {
-            if (confirm("Diqqat! Barcha ma'lumotlar butunlay o'chib ketadi. Rozimisiz?")) {
-                localStorage.removeItem('chal_elite_v1');
-                location.reload();
-            }
-        }
-
-        // ===== EXPORT =====
-        function downloadTXT() {
-            let txt = "CHALLENGE LUG'ATLAR RO'YXATI\n\n";
-            Object.keys(db.cards).sort((a, b) => a - b).forEach(k => {
-                if (db.cards[k].slovar) txt += `--- ${k}-KUN ---\n${db.cards[k].slovar}\n\n`;
-            });
-            const blob = new Blob(['\ufeff' + txt], { type: 'text/plain;charset=utf-8' });
-            const a = document.createElement('a');
-            a.download = 'Lugat_Challenge.txt';
-            a.href = URL.createObjectURL(blob);
-            a.click();
-        }
-
-        function exportExcel() {
-            if (typeof XLSX === 'undefined') {
-                // Fallback: export as CSV
-                let csv = "Kun,Start,Finish,Order,Lug'at,Kutilgan Foyda,Tushum,Xarajat,Sof Foyda\n";
-                Object.keys(db.cards).sort((a, b) => a - b).forEach(k => {
-                    let d = db.cards[k];
-                    csv += `${k},${d.s||''},${d.e||''},${d.o||0},${d.w||0},${d.p||0},${d.i||0},${d.x||0},${Number(d.i||0)-Number(d.x||0)}\n`;
-                });
-                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
-                const a = document.createElement('a');
-                a.download = 'Challenge_Report.csv';
-                a.href = URL.createObjectURL(blob);
-                a.click();
-                showToast('📊 CSV yuklab olindi!');
-                return;
-            }
-            let data = [["Kun", "Start", "Finish", "Order", "Lug'at", "Kutilgan Foyda", "Tushum", "Xarajat", "Sof Foyda"]];
-            Object.keys(db.cards).sort((a, b) => a - b).forEach(k => {
-                let d = db.cards[k];
-                data.push([k, d.s || '', d.e || '', d.o || 0, d.w || 0, d.p || 0, d.i || 0, d.x || 0, (Number(d.i || 0) - Number(d.x || 0))]);
-            });
-            let ws = XLSX.utils.aoa_to_sheet(data);
-            let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Hisobot");
-            XLSX.writeFile(wb, "Challenge_Report.xlsx");
-            showToast('📊 Excel yuklab olindi!');
-        }
-
-        // ===== SYNC =====
-        function sync() { localStorage.setItem('chal_elite_v1', JSON.stringify(db)); update(); }
-
-        // ===== TOAST =====
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2200);
-        }
-
-        // ===== CONFETTI =====
-        function launchConfetti() {
-            const colors = ['#ff6b35', '#ffd23f', '#00cec9', '#fd79a8', '#a29bfe', '#55efc4'];
-            for (let i = 0; i < 60; i++) {
-                setTimeout(() => {
-                    const el = document.createElement('div');
-                    el.className = 'confetti-piece';
-                    el.style.cssText = `left:${Math.random()*100}vw; top:-20px; background:${colors[Math.floor(Math.random()*colors.length)]}; width:${6+Math.random()*8}px; height:${6+Math.random()*8}px; animation-duration:${2+Math.random()*2}s; animation-delay:${Math.random()*1}s;`;
-                    document.body.appendChild(el);
-                    setTimeout(() => el.remove(), 4000);
-                }, i * 50);
-            }
-            showToast('🏆 MAQSADGA YETDINGIZ!');
-        }
-
-        init();
-    </script>
+// ── INITIALIZATION ──
+vocab=loadVocab();
+render();
+</script>
 </body>
 </html>
